@@ -1,0 +1,16 @@
+﻿# Data files — private, don't commit
+members.json
+messages.json
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment / secrets
+.env
+venv/
+.venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db

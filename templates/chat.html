@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Gathering — Tarot Club</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background: #14121a;
+            color: #d8d4e0;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 720px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.6em;
+            color: #d8d4e0;
+            margin-bottom: 0.2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #6a6380;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+        .messages {
+            background: #1e1b26;
+            border: 1px solid #3a3450;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #2a2536;
+        }
+        .message:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .meta {
+            font-size: 0.85em;
+            color: #8a7fb0;
+            margin-bottom: 4px;
+        }
+        .meta .name {
+            color: #b8a8e0;
+            font-weight: bold;
+        }
+        .meta .time {
+            color: #6a6380;
+            margin-left: 8px;
+        }
+        .text {
+            color: #d8d4e0;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+        .empty {
+            color: #6a6380;
+            text-align: center;
+            font-style: italic;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            background: #1e1b26;
+            border: 1px solid #3a3450;
+            color: #d8d4e0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+        button {
+            padding: 12px 24px;
+            background: #6a4fa3;
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:hover { background: #7d5fc0; }
+        .topnav {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 0.9em;
+        }
+        .topnav a {
+            color: #a68fd6;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .topnav a:hover { color: #c4a8ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topnav">
+            <a href="/members">Members</a> |
+            <a href="/chat">Gathering</a> |
+            <a href="/logout">Log out</a>
+        </div>
+
+        <h1>The Gathering</h1>
+        <p class="subtitle">You speak as {{ title }} {{ display }}.</p>
+
+        <div class="messages">
+            {% if messages %}
+                {% for m in messages %}
+                    <div class="message">
+                        <div class="meta">
+                            <span class="name">{{ m.sender_title }} {{ m.sender_display }}</span>
+                            <span class="time">{{ m.time }}</span>
+                        </div>
+                        <div class="text">{{ m.text }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty">The gathering is silent. Speak, and it shall begin.</p>
+            {% endif %}
+        </div>
+
+        <form method="post">
+            <input type="text" name="text" placeholder="Speak your mind..." autocomplete="off" autofocus required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Members — Tarot Club</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background: #14121a;
+            color: #d8d4e0;
+            text-align: center;
+            padding: 80px 20px;
+        }
+        h1 { font-size: 2em; margin-bottom: 0.3em; }
+        .welcome { color: #8fd18f; font-size: 1.1em; margin-bottom: 40px; }
+        ul { list-style: none; padding: 0; }
+        li { margin: 8px 0; color: #b8b0c8; }
+        .topnav {
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        .topnav a {
+            color: #a68fd6;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .topnav a:hover { color: #c4a8ff; }
+    </style>
+</head>
+<body>
+    <div class="topnav">
+        <a href="/members">Members</a> |
+        <a href="/chat">The Gathering</a> |
+        <a href="/logout">Log out</a>
+    </div>
+
+    <h1>The Gathering</h1>
+    <p class="welcome">Welcome, {{ title }} {{ display }}.</p>
+
+    <ul>
+    {% for member in members %}
+        <li>{{ member }}</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tarot Club</title>
     <style>
         body {
@@ -10,13 +11,60 @@
             color: #d8d4e0;
             text-align: center;
             padding: 80px 20px;
+            margin: 0;
         }
-        h1 { font-size: 2.5em; margin-bottom: 0.2em; }
-        p  { color: #9a93a8; }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.2em;
+        }
+        p {
+            color: #b8b0c8;
+            font-size: 1.05em;
+        }
+        nav {
+            margin-top: 50px;
+        }
+        nav a {
+            display: inline-block;
+            margin: 10px 12px;
+            padding: 14px 32px;
+            font-size: 1.05em;
+            font-family: inherit;
+            text-decoration: none;
+            color: #fff;
+            background: #6a4fa3;
+            border: 2px solid #6a4fa3;
+            border-radius: 6px;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        nav a:hover,
+        nav a:focus {
+            background: #7d5fc0;
+            border-color: #9a7fe0;
+            outline: 3px solid #c4a8ff;
+            outline-offset: 3px;
+        }
+        nav a.secondary {
+            background: transparent;
+            color: #c4a8ff;
+            border-color: #6a4fa3;
+        }
+        nav a.secondary:hover,
+        nav a.secondary:focus {
+            background: #2a2536;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
-    <h1>Welcome to the Tarot Club</h1>
-    <p>The gathering is not yet in session.</p>
+    <main>
+        <h1>Welcome to the Tarot Club</h1>
+        <p>The gathering is not yet in session.</p>
+
+        <nav aria-label="Main navigation">
+            <a href="/register">Enter the Club</a>
+            <a href="/login" class="secondary">Already a member?</a>
+        </nav>
+    </main>
 </body>
 </html>

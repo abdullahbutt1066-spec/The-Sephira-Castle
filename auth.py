@@ -1,21 +1,37 @@
-﻿import json
-import os
-import hashlib
+﻿import hashlib
 import secrets
-
-MEMBERS_FILE = "members.json"
+from db import get_connection
 
 
 def load_members():
-    if os.path.exists(MEMBERS_FILE):
-        with open(MEMBERS_FILE, "r") as f:
-            return json.load(f)
-    return {}
+    """Return dict of {codename: {salt, password, gender}}."""
+    members = {}
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT codename, salt, password, gender FROM members")
+            for codename, salt, password, gender in cur.fetchall():
+                members[codename] = {
+                    "salt": salt,
+                    "password": password,
+                    "gender": gender,
+                }
+    return members
 
 
 def save_members(members):
-    with open(MEMBERS_FILE, "w") as f:
-        json.dump(members, f, indent=2)
+    """Upsert all members. Used for full-sync saves."""
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            for codename, info in members.items():
+                cur.execute("""
+                    INSERT INTO members (codename, salt, password, gender)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (codename) DO UPDATE SET
+                        salt = EXCLUDED.salt,
+                        password = EXCLUDED.password,
+                        gender = EXCLUDED.gender
+                """, (codename, info["salt"], info["password"], info["gender"]))
+        conn.commit()
 
 
 def make_salt():
@@ -39,4 +55,3 @@ def display_name(codename):
     if codename.lower().startswith("the "):
         return codename[4:]
     return codename
-

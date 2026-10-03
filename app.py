@@ -2,9 +2,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import auth
 import messages as msg_store
+from db import init_db
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-fallback-key")
+init_db()
 
 
 def current_user():

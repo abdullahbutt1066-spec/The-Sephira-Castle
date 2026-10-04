@@ -2,6 +2,31 @@
 import secrets
 from db import get_connection
 
+CARDS = [
+    "The Fool",
+    "The Magician",
+    "The High Priestess",
+    "The Empress",
+    "The Emperor",
+    "The Hierophant",
+    "The Lovers",
+    "The Chariot",
+    "Strength",
+    "The Hermit",
+    "Wheel of Fortune",
+    "Justice",
+    "The Hanged Man",
+    "Death",
+    "Temperance",
+    "The Devil",
+    "The Tower",
+    "The Star",
+    "The Moon",
+    "The Sun",
+    "Judgement",
+    "The World",
+]
+
 
 def load_members():
     """Return dict of {codename: {salt, password, gender}}."""
@@ -19,7 +44,7 @@ def load_members():
 
 
 def save_members(members):
-    """Upsert all members. Used for full-sync saves."""
+    """Upsert all members."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             for codename, info in members.items():

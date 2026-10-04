@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Gathering — Tarot Club</title>
     <style>
         body {
@@ -142,5 +143,17 @@
             <button type="submit">Send</button>
         </form>
     </div>
+
+    <script>
+        let isTyping = false;
+        const input = document.querySelector('input[name="text"]');
+        if (input) {
+            input.addEventListener('input', () => { isTyping = true; });
+            input.addEventListener('blur',  () => { isTyping = false; });
+        }
+        setInterval(() => {
+            if (!isTyping && !document.hidden) location.reload();
+        }, 3000);
+    </script>
 </body>
 </html>

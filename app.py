@@ -33,6 +33,8 @@ def register():
 
         if not codename or not password:
             message = "Codename and password are required."
+        elif codename not in auth.CARDS:
+            message = "Please choose one of the Major Arcana."
         elif codename in members:
             message = "That codename is already taken."
         elif gender not in ("male", "female"):
@@ -48,7 +50,7 @@ def register():
             message = f"Welcome to the club, {auth.title_for(gender)} {auth.display_name(codename)}."
             success = True
 
-    return render_template("register.html", message=message, success=success)
+    return render_template("register.html", message=message, success=success, cards=auth.CARDS)
 
 
 @app.route("/login", methods=["GET", "POST"])

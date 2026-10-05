@@ -1,6 +1,7 @@
 ﻿import hashlib
 import secrets
 import json
+from datetime import datetime
 from db import get_connection
 
 CARDS = [
@@ -119,7 +120,6 @@ def display_name(codename):
 
 
 def verify_recovery(recovery_input, recovery_hash):
-    """Recovery hash is stored as 'hash:salt'. Verify the input against it."""
     if not recovery_hash:
         return False
     try:
@@ -131,3 +131,51 @@ def verify_recovery(recovery_input, recovery_hash):
 
 def make_device_token():
     return secrets.token_hex(24)
+
+
+def is_expelled(codename):
+    """Has this codename been permanently expelled?"""
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1 FROM expelled_names WHERE codename = %s", (codename,))
+            return cur.fetchone() is not None
+
+
+def remove_member(codename):
+    """Delete a member from the members table."""
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM members WHERE codename = %s", (codename,))
+        conn.commit()
+
+
+def record_expulsion(codename, expelled_by):
+    """Add to expulsions log and expelled_names tombstones."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO expulsions (codename, expelled_by, expelled_at) VALUES (%s, %s, %s)",
+                (codename, expelled_by, now)
+            )
+            cur.execute("""
+                INSERT INTO expelled_names (codename, expelled_at)
+                VALUES (%s, %s)
+                ON CONFLICT (codename) DO NOTHING
+            """, (codename, now))
+        conn.commit()
+
+
+def load_expulsions():
+    """Return list of all expulsions, newest first."""
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT codename, expelled_by, expelled_at
+                FROM expulsions
+                ORDER BY id DESC
+            """)
+            return [
+                {"codename": row[0], "expelled_by": row[1], "expelled_at": row[2]}
+                for row in cur.fetchall()
+            ]

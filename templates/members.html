@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Members — Tarot Club</title>
     <style>
         body {
@@ -10,6 +11,7 @@
             color: #d8d4e0;
             text-align: center;
             padding: 80px 20px;
+            margin: 0;
         }
         h1 { font-size: 2em; margin-bottom: 0.3em; }
         .welcome { color: #8fd18f; font-size: 1.1em; margin-bottom: 40px; }
@@ -31,6 +33,7 @@
     <div class="topnav">
         <a href="/members">Members</a> |
         <a href="/chat">The Gathering</a> |
+        {% if is_fool %}<a href="/admin">Admin</a> |{% endif %}
         <a href="/logout">Log out</a>
     </div>
 

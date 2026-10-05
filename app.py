@@ -44,6 +44,8 @@ def register():
             message = "Codename and password are required."
         elif codename not in auth.CARDS:
             message = "Please choose one of the Major Arcana."
+        elif auth.is_expelled(codename):
+            message = "That name has been struck from the record."
         elif codename in members:
             message = "That codename is already taken."
         elif gender not in ("male", "female"):
@@ -92,34 +94,33 @@ def login():
     if request.method == "POST":
         codename = request.form.get("codename", "").strip()
         password = request.form.get("password", "").strip()
-        members = auth.load_members()
 
-        if codename in members:
-            info = members[codename]
-            if info["password"] == auth.hash_password(password, info["salt"]):
-                # Login password correct
-                if info.get("is_fool"):
-                    # Check the device cookie
-                    token = request.cookies.get("fool_device")
-                    if token and token in info.get("device_tokens", []):
+        if auth.is_expelled(codename):
+            message = "You have been expelled from the club."
+        else:
+            members = auth.load_members()
+            if codename in members:
+                info = members[codename]
+                if info["password"] == auth.hash_password(password, info["salt"]):
+                    if info.get("is_fool"):
+                        token = request.cookies.get("fool_device")
+                        if token and token in info.get("device_tokens", []):
+                            session["user"] = codename
+                            return redirect(url_for("members"))
+                        else:
+                            session["pending_fool_login"] = codename
+                            return redirect(url_for("fool_bind"))
+                    else:
                         session["user"] = codename
                         return redirect(url_for("members"))
-                    else:
-                        # Device not bound — save intent, go to bind page
-                        session["pending_fool_login"] = codename
-                        return redirect(url_for("fool_bind"))
-                else:
-                    session["user"] = codename
-                    return redirect(url_for("members"))
 
-        message = "You are not worthy, nor are you the chosen one."
+            message = "You are not worthy, nor are you the chosen one."
 
     return render_template("login.html", message=message)
 
 
 @app.route("/fool-bind", methods=["GET", "POST"])
 def fool_bind():
-    """Bind a new device to The Fool using the recovery password."""
     pending = session.get("pending_fool_login")
     if pending != "The Fool":
         return redirect(url_for("login"))
@@ -139,7 +140,6 @@ def fool_bind():
         elif len(info.get("device_tokens", [])) >= auth.DEVICE_LIMIT:
             message = "Two devices are already bound. Release one before binding another."
         else:
-            # Bind this device
             new_token = auth.make_device_token()
             info.setdefault("device_tokens", []).append(new_token)
             auth.save_members(members)
@@ -176,6 +176,7 @@ def members():
         title=title,
         display=display,
         members=listing,
+        is_fool=info.get("is_fool", False),
     )
 
 
@@ -190,17 +191,19 @@ def chat():
         session.pop("user", None)
         return redirect(url_for("login"))
 
+    info = all_members[user]
+    is_fool = info.get("is_fool", False)
+
     if request.method == "POST":
         text = request.form.get("text", "").strip()
         if text:
             msg_store.add_message(user, text)
         return redirect(url_for("chat"))
 
-    info = all_members[user]
     title = auth.title_for(info["gender"])
     display = auth.display_name(user)
 
-    raw = msg_store.load_messages()
+    raw = msg_store.load_messages(include_deleted=is_fool)
     decorated = []
     for m in raw:
         sender = m.get("from", "")
@@ -213,10 +216,14 @@ def chat():
             sender_display = sender
 
         decorated.append({
+            "id": m.get("id"),
             "sender_title": sender_title,
             "sender_display": sender_display,
             "text": m.get("text", ""),
             "time": m.get("time", ""),
+            "deleted": m.get("deleted", False),
+            "deleted_by": m.get("deleted_by", ""),
+            "deleted_at": m.get("deleted_at", ""),
         })
 
     return render_template(
@@ -224,7 +231,80 @@ def chat():
         title=title,
         display=display,
         messages=decorated,
+        is_fool=is_fool,
     )
+
+
+@app.route("/chat/delete", methods=["POST"])
+def chat_delete():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members or not members[user].get("is_fool"):
+        return redirect(url_for("chat"))
+
+    message_id = request.form.get("message_id", "").strip()
+    if message_id.isdigit():
+        msg_store.soft_delete_message(int(message_id), deleted_by="The Fool")
+
+    return redirect(url_for("chat"))
+
+
+@app.route("/admin")
+def admin():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members or not members[user].get("is_fool"):
+        return redirect(url_for("members"))
+
+    listing = []
+    for name, info in members.items():
+        listing.append({
+            "codename": name,
+            "title": auth.title_for(info["gender"]),
+            "display": auth.display_name(name),
+            "is_fool": info.get("is_fool", False),
+        })
+
+    expulsions = auth.load_expulsions()
+
+    return render_template(
+        "admin.html",
+        members=listing,
+        expulsions=expulsions,
+        message=request.args.get("msg"),
+    )
+
+
+@app.route("/admin/remove", methods=["POST"])
+def admin_remove():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members or not members[user].get("is_fool"):
+        return redirect(url_for("members"))
+
+    target = request.form.get("codename", "").strip()
+
+    if not target:
+        return redirect(url_for("admin", msg="No target provided."))
+    if target == "The Fool":
+        return redirect(url_for("admin", msg="You cannot remove yourself."))
+    if target not in members:
+        return redirect(url_for("admin", msg="That member does not exist."))
+
+    msg_store.tombstone_messages_from(target)
+    auth.record_expulsion(target, expelled_by="The Fool")
+    auth.remove_member(target)
+
+    return redirect(url_for("admin", msg=f"{target} has been expelled."))
 
 
 @app.route("/logout")

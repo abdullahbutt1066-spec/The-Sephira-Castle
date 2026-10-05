@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Tarot Club</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background: #14121a;
+            color: #d8d4e0;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 720px;
+        }
+        h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
+        .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
+        .topnav { text-align: center; margin-bottom: 30px; font-size: 0.9em; }
+        .topnav a { color: #a68fd6; text-decoration: none; margin: 0 10px; }
+        .topnav a:hover { color: #c4a8ff; }
+        h2 { font-size: 1.1em; color: #b8a8e0; margin-top: 30px; border-bottom: 1px solid #2a2536; padding-bottom: 6px; }
+        .member-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #1e1b26;
+            border: 1px solid #2a2536;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .member-name { color: #d8d4e0; }
+        .fool-tag { color: #c4a8ff; font-size: 0.85em; margin-left: 8px; }
+        button.remove {
+            background: #5a2a3a;
+            color: #f0c8c8;
+            border: 1px solid #8a3a4a;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85em;
+        }
+        button.remove:hover { background: #7a3a4a; }
+        .empty { color: #6a6380; font-style: italic; text-align: center; padding: 12px; }
+        .expulsion {
+            padding: 8px 12px;
+            background: #1e1b26;
+            border-left: 3px solid #8a3a4a;
+            margin-bottom: 6px;
+            font-size: 0.9em;
+            color: #b8b0c8;
+        }
+        .msg { text-align: center; color: #8fd18f; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topnav">
+            <a href="/members">Members</a> |
+            <a href="/chat">Gathering</a> |
+            <a href="/admin">Admin</a> |
+            <a href="/logout">Log out</a>
+        </div>
+
+        <h1>The Fool's Chamber</h1>
+        <p class="subtitle">Only The Fool sees this room.</p>
+
+        {% if message %}
+            <p class="msg">{{ message }}</p>
+        {% endif %}
+
+        <h2>Members</h2>
+        {% if members %}
+            {% for m in members %}
+                <div class="member-row">
+                    <span class="member-name">
+                        {{ m.title }} {{ m.display }}
+                        {% if m.is_fool %}<span class="fool-tag">✦ The Fool</span>{% endif %}
+                    </span>
+                    {% if not m.is_fool %}
+                        <form method="post" action="/admin/remove" style="margin:0;"
+                              onsubmit="return confirm('Expel {{ m.title }} {{ m.display }}? This cannot be undone.');">
+                            <input type="hidden" name="codename" value="{{ m.codename }}">
+                            <button type="submit" class="remove">Remove</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No members.</p>
+        {% endif %}
+
+        <h2>Record of Expulsions</h2>
+        {% if expulsions %}
+            {% for e in expulsions %}
+                <div class="expulsion">
+                    <strong>{{ e.codename }}</strong> — expelled by {{ e.expelled_by }} on {{ e.expelled_at }}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No one has been expelled.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

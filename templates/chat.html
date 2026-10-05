@@ -44,6 +44,7 @@
             margin-bottom: 18px;
             padding-bottom: 14px;
             border-bottom: 1px solid #2a2536;
+            position: relative;
         }
         .message:last-child {
             border-bottom: none;
@@ -54,6 +55,9 @@
             font-size: 0.85em;
             color: #8a7fb0;
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .meta .name {
             color: #b8a8e0;
@@ -61,19 +65,48 @@
         }
         .meta .time {
             color: #6a6380;
-            margin-left: 8px;
+        }
+        .meta .spacer { flex: 1; }
+        .meta form { margin: 0; }
+        .meta button.delete {
+            background: transparent;
+            border: 1px solid #5a2a3a;
+            color: #c48f8f;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .meta button.delete:hover {
+            background: #5a2a3a;
+            color: #f0c8c8;
         }
         .text {
             color: #d8d4e0;
             line-height: 1.4;
             white-space: pre-wrap;
         }
+        .message.deleted .text {
+            color: #6a6380;
+            text-decoration: line-through;
+            font-style: italic;
+        }
+        .message.deleted .meta .name {
+            color: #6a6380;
+        }
+        .deleted-note {
+            font-size: 0.75em;
+            color: #8a3a4a;
+            margin-top: 4px;
+            font-style: italic;
+        }
         .empty {
             color: #6a6380;
             text-align: center;
             font-style: italic;
         }
-        form {
+        form.new-message {
             display: flex;
             gap: 10px;
         }
@@ -87,7 +120,7 @@
             font-family: inherit;
             font-size: 1em;
         }
-        button {
+        button.send {
             padding: 12px 24px;
             background: #6a4fa3;
             border: none;
@@ -97,7 +130,7 @@
             cursor: pointer;
             font-family: inherit;
         }
-        button:hover { background: #7d5fc0; }
+        button.send:hover { background: #7d5fc0; }
         .topnav {
             text-align: center;
             margin-bottom: 24px;
@@ -116,6 +149,7 @@
         <div class="topnav">
             <a href="/members">Members</a> |
             <a href="/chat">Gathering</a> |
+            {% if is_fool %}<a href="/admin">Admin</a> |{% endif %}
             <a href="/logout">Log out</a>
         </div>
 
@@ -125,12 +159,25 @@
         <div class="messages">
             {% if messages %}
                 {% for m in messages %}
-                    <div class="message">
+                    <div class="message {% if m.deleted %}deleted{% endif %}">
                         <div class="meta">
                             <span class="name">{{ m.sender_title }} {{ m.sender_display }}</span>
                             <span class="time">{{ m.time }}</span>
+                            <span class="spacer"></span>
+                            {% if is_fool and not m.deleted %}
+                                <form method="post" action="/chat/delete"
+                                      onsubmit="return confirm('Delete this message?');">
+                                    <input type="hidden" name="message_id" value="{{ m.id }}">
+                                    <button type="submit" class="delete">Delete</button>
+                                </form>
+                            {% endif %}
                         </div>
                         <div class="text">{{ m.text }}</div>
+                        {% if m.deleted and is_fool %}
+                            <div class="deleted-note">
+                                Deleted by {{ m.deleted_by }} at {{ m.deleted_at }}
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             {% else %}
@@ -138,9 +185,9 @@
             {% endif %}
         </div>
 
-        <form method="post">
+        <form method="post" class="new-message">
             <input type="text" name="text" placeholder="Speak your mind..." autocomplete="off" autofocus required>
-            <button type="submit">Send</button>
+            <button type="submit" class="send">Send</button>
         </form>
     </div>
 

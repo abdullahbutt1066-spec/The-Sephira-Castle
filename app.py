@@ -1,5 +1,5 @@
 ﻿import os
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, make_response
 import auth
 import messages as msg_store
 from db import init_db
@@ -10,8 +10,14 @@ init_db()
 
 
 def current_user():
-    """Return the logged-in codename, or None."""
     return session.get("user")
+
+
+def client_ip():
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.remote_addr or "unknown"
 
 
 @app.route("/")
@@ -28,8 +34,11 @@ def register():
         codename = request.form.get("codename", "").strip()
         gender   = request.form.get("gender", "").strip().lower()
         password = request.form.get("password", "").strip()
+        recovery = request.form.get("recovery_password", "").strip()
 
         members = auth.load_members()
+        is_fool_registration = (codename == "The Fool")
+        ip = client_ip()
 
         if not codename or not password:
             message = "Codename and password are required."
@@ -39,18 +48,41 @@ def register():
             message = "That codename is already taken."
         elif gender not in ("male", "female"):
             message = "Please choose a gender."
+        elif is_fool_registration and not recovery:
+            message = "The Fool must set a recovery password."
+        elif is_fool_registration and recovery == password:
+            message = "Recovery password must be different from your login password."
+        elif not is_fool_registration and auth.count_registrations_from_ip(ip) >= auth.IP_LIMIT:
+            message = "Don't try to impersonate someone else. Or else your consequences will be dire."
         else:
             salt = auth.make_salt()
-            members[codename] = {
+            entry = {
                 "salt": salt,
                 "password": auth.hash_password(password, salt),
                 "gender": gender,
+                "is_fool": is_fool_registration,
+                "recovery_hash": None,
+                "device_tokens": [],
+                "ip": ip,
             }
+            if is_fool_registration:
+                rec_salt = auth.make_salt()
+                entry["recovery_hash"] = auth.hash_password(recovery, rec_salt) + ":" + rec_salt
+            members[codename] = entry
             auth.save_members(members)
             message = f"Welcome to the club, {auth.title_for(gender)} {auth.display_name(codename)}."
             success = True
 
-    return render_template("register.html", message=message, success=success, cards=auth.CARDS)
+    all_members = auth.load_members()
+    taken = list(all_members.keys())
+
+    return render_template(
+        "register.html",
+        message=message,
+        success=success,
+        cards=auth.CARDS,
+        taken=taken,
+    )
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -65,12 +97,59 @@ def login():
         if codename in members:
             info = members[codename]
             if info["password"] == auth.hash_password(password, info["salt"]):
-                session["user"] = codename
-                return redirect(url_for("members"))
+                # Login password correct
+                if info.get("is_fool"):
+                    # Check the device cookie
+                    token = request.cookies.get("fool_device")
+                    if token and token in info.get("device_tokens", []):
+                        session["user"] = codename
+                        return redirect(url_for("members"))
+                    else:
+                        # Device not bound — save intent, go to bind page
+                        session["pending_fool_login"] = codename
+                        return redirect(url_for("fool_bind"))
+                else:
+                    session["user"] = codename
+                    return redirect(url_for("members"))
 
         message = "You are not worthy, nor are you the chosen one."
 
     return render_template("login.html", message=message)
+
+
+@app.route("/fool-bind", methods=["GET", "POST"])
+def fool_bind():
+    """Bind a new device to The Fool using the recovery password."""
+    pending = session.get("pending_fool_login")
+    if pending != "The Fool":
+        return redirect(url_for("login"))
+
+    message = None
+
+    if request.method == "POST":
+        recovery = request.form.get("recovery_password", "").strip()
+        members = auth.load_members()
+        info = members.get("The Fool")
+
+        if not info:
+            return redirect(url_for("login"))
+
+        if not auth.verify_recovery(recovery, info.get("recovery_hash")):
+            message = "The recovery password is incorrect."
+        elif len(info.get("device_tokens", [])) >= auth.DEVICE_LIMIT:
+            message = "Two devices are already bound. Release one before binding another."
+        else:
+            # Bind this device
+            new_token = auth.make_device_token()
+            info.setdefault("device_tokens", []).append(new_token)
+            auth.save_members(members)
+            session.pop("pending_fool_login", None)
+            session["user"] = "The Fool"
+            resp = make_response(redirect(url_for("members")))
+            resp.set_cookie("fool_device", new_token, max_age=60*60*24*365, httponly=True, samesite="Lax")
+            return resp
+
+    return render_template("fool_bind.html", message=message)
 
 
 @app.route("/members")

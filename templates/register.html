@@ -51,6 +51,8 @@
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; }
         .msg.ok  { color: #8fd18f; }
         .msg.err { color: #d18f8f; }
+        .hidden { display: none; }
+        .hint { font-size: 0.75em; color: #6a6380; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -66,7 +68,9 @@
             <select id="codename" name="codename" required>
                 <option value="" disabled selected>— Choose your card —</option>
                 {% for card in cards %}
-                    <option value="{{ card }}">{{ card }}</option>
+                    <option value="{{ card }}" {% if card in taken %}disabled{% endif %}>
+                        {{ card }}{% if card in taken %} (taken){% endif %}
+                    </option>
                 {% endfor %}
             </select>
 
@@ -79,8 +83,30 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
 
+            <div id="recovery-block" class="hidden">
+                <label for="recovery_password">Recovery Password</label>
+                <input type="password" id="recovery_password" name="recovery_password">
+                <p class="hint">Only The Fool has a recovery password. Choose carefully — it cannot be changed.</p>
+            </div>
+
             <button type="submit">Register</button>
         </form>
     </div>
+
+    <script>
+        const codenameSelect = document.getElementById('codename');
+        const recoveryBlock = document.getElementById('recovery-block');
+        const recoveryInput = document.getElementById('recovery_password');
+
+        codenameSelect.addEventListener('change', () => {
+            if (codenameSelect.value === 'The Fool') {
+                recoveryBlock.classList.remove('hidden');
+                recoveryInput.required = true;
+            } else {
+                recoveryBlock.classList.add('hidden');
+                recoveryInput.required = false;
+            }
+        });
+    </script>
 </body>
 </html>

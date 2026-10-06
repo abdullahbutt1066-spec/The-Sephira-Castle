@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages — Tarot Club</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background: #14121a;
+            color: #d8d4e0;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container { width: 100%; max-width: 640px; }
+        h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
+        .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
+        .topnav { text-align: center; margin-bottom: 30px; font-size: 0.9em; }
+        .topnav a { color: #a68fd6; text-decoration: none; margin: 0 10px; }
+        .topnav a:hover { color: #c4a8ff; }
+        .thread-list { list-style: none; padding: 0; margin: 0; }
+        .thread-item {
+            display: block;
+            padding: 16px 20px;
+            background: #1e1b26;
+            border: 1px solid #2a2536;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: #d8d4e0;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .thread-item:hover {
+            background: #252030;
+            border-color: #6a4fa3;
+        }
+        .thread-row1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .thread-title { font-size: 1.05em; color: #b8a8e0; font-weight: bold; }
+        .thread-badge {
+            background: #6a4fa3;
+            color: #fff;
+            border-radius: 10px;
+            padding: 2px 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .thread-row2 {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #6a6380;
+        }
+        .thread-preview { color: #8a7fb0; }
+        .thread-time { color: #5a5560; }
+        .empty {
+            text-align: center;
+            color: #6a6380;
+            font-style: italic;
+            padding: 30px 0;
+        }
+        .new-thread {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            padding: 14px;
+            background: #6a4fa3;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        .new-thread:hover { background: #7d5fc0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topnav">
+            <a href="/members">Members</a> |
+            <a href="/chat">Gathering</a> |
+            <a href="/messages">Messages{% if nav_unread %} ({{ nav_unread }}){% endif %}</a> |
+            {% if is_fool %}<a href="/admin">Admin</a> |{% endif %}
+            <a href="/logout">Log out</a>
+        </div>
+
+        <h1>Private Conversations</h1>
+        <p class="subtitle">You speak as {{ title }} {{ display }}.</p>
+
+        {% if threads %}
+            <ul class="thread-list">
+                {% for t in threads %}
+                    <a class="thread-item" href="/messages/{{ t.id }}">
+                        <div class="thread-row1">
+                            <span class="thread-title">{{ t.title }}</span>
+                            {% if t.unread > 0 %}
+                                <span class="thread-badge">{{ t.unread }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="thread-row2">
+                            <span class="thread-preview">{{ t.last_preview }}</span>
+                            <span class="thread-time">{{ t.last_time }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty">
+                {% if is_fool %}
+                    You have not yet opened a private conversation.<br>
+                    Choose a member to begin.
+                {% else %}
+                    You have no private conversations.<br>
+                    If you wish to speak with The Fool, say so in the Gathering.
+                {% endif %}
+            </p>
+        {% endif %}
+
+        {% if is_fool %}
+            <a class="new-thread" href="/messages/new">+ Begin a New Private Thread</a>
+        {% endif %}
+    </div>
+</body>
+</html>

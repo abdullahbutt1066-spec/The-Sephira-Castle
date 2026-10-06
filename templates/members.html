@@ -17,15 +17,8 @@
         .welcome { color: #8fd18f; font-size: 1.1em; margin-bottom: 40px; }
         ul { list-style: none; padding: 0; }
         li { margin: 8px 0; color: #b8b0c8; }
-        .topnav {
-            margin-bottom: 30px;
-            font-size: 0.9em;
-        }
-        .topnav a {
-            color: #a68fd6;
-            text-decoration: none;
-            margin: 0 10px;
-        }
+        .topnav { margin-bottom: 30px; font-size: 0.9em; }
+        .topnav a { color: #a68fd6; text-decoration: none; margin: 0 10px; }
         .topnav a:hover { color: #c4a8ff; }
     </style>
 </head>
@@ -33,6 +26,7 @@
     <div class="topnav">
         <a href="/members">Members</a> |
         <a href="/chat">The Gathering</a> |
+        <a href="/messages">Messages{% if nav_unread %} ({{ nav_unread }}){% endif %}</a> |
         {% if is_fool %}<a href="/admin">Admin</a> |{% endif %}
         <a href="/logout">Log out</a>
     </div>

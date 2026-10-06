@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Gathering — Tarot Club</title>
+    <title>{{ thread_title }} — Tarot Club</title>
     <style>
         body {
             font-family: Georgia, serif;
@@ -15,8 +15,13 @@
             justify-content: center;
         }
         .container { width: 100%; max-width: 720px; }
-        h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
-        .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
+        h1 { font-size: 1.5em; margin-bottom: 0.2em; }
+        .subtitle { color: #6a6380; font-size: 0.85em; margin-bottom: 20px; }
+        .topnav { text-align: center; margin-bottom: 30px; font-size: 0.9em; }
+        .topnav a { color: #a68fd6; text-decoration: none; margin: 0 10px; }
+        .topnav a:hover { color: #c4a8ff; }
+        .back { color: #a68fd6; text-decoration: none; font-size: 0.9em; display: inline-block; margin-bottom: 20px; }
+        .back:hover { color: #c4a8ff; }
         .messages {
             background: #1e1b26;
             border: 1px solid #3a3450;
@@ -33,7 +38,14 @@
             border-bottom: 1px solid #2a2536;
         }
         .message:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .meta { font-size: 0.85em; color: #8a7fb0; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+        .meta {
+            font-size: 0.85em;
+            color: #8a7fb0;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .meta .name { color: #b8a8e0; font-weight: bold; }
         .meta .time { color: #6a6380; }
         .meta .spacer { flex: 1; }
@@ -52,7 +64,12 @@
         .text { color: #d8d4e0; line-height: 1.4; white-space: pre-wrap; }
         .message.deleted .text { color: #6a6380; text-decoration: line-through; font-style: italic; }
         .message.deleted .meta .name { color: #6a6380; }
-        .deleted-note { font-size: 0.75em; color: #8a3a4a; margin-top: 4px; font-style: italic; }
+        .deleted-note {
+            font-size: 0.75em;
+            color: #8a3a4a;
+            margin-top: 4px;
+            font-style: italic;
+        }
         .empty { color: #6a6380; text-align: center; font-style: italic; }
         form.new-message { display: flex; gap: 10px; }
         input[type="text"] {
@@ -76,9 +93,7 @@
             font-family: inherit;
         }
         button.send:hover { background: #7d5fc0; }
-        .topnav { text-align: center; margin-bottom: 24px; font-size: 0.9em; }
-        .topnav a { color: #a68fd6; text-decoration: none; margin: 0 10px; }
-        .topnav a:hover { color: #c4a8ff; }
+        .participants { color: #8a7fb0; font-size: 0.85em; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -91,8 +106,10 @@
             <a href="/logout">Log out</a>
         </div>
 
-        <h1>The Gathering</h1>
-        <p class="subtitle">You speak as {{ title }} {{ display }}.</p>
+        <a class="back" href="/messages">&larr; All conversations</a>
+
+        <h1>{{ thread_title }}</h1>
+        <p class="participants">Members: {{ participants_str }}</p>
 
         <div class="messages">
             {% if messages %}
@@ -103,7 +120,7 @@
                             <span class="time">{{ m.time }}</span>
                             <span class="spacer"></span>
                             {% if is_fool and not m.deleted %}
-                                <form method="post" action="/chat/delete"
+                                <form method="post" action="/messages/{{ thread_id }}/delete"
                                       onsubmit="return confirm('Delete this message?');">
                                     <input type="hidden" name="message_id" value="{{ m.id }}">
                                     <button type="submit" class="delete">Delete</button>
@@ -117,12 +134,12 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <p class="empty">The gathering is silent. Speak, and it shall begin.</p>
+                <p class="empty">No messages yet. Speak first.</p>
             {% endif %}
         </div>
 
-        <form method="post" class="new-message">
-            <input type="text" name="text" placeholder="Speak your mind..." autocomplete="off" autofocus required>
+        <form method="post" action="/messages/{{ thread_id }}/send" class="new-message">
+            <input type="text" name="text" placeholder="Speak privately..." autocomplete="off" autofocus required>
             <button type="submit" class="send">Send</button>
         </form>
     </div>
@@ -136,7 +153,7 @@
         }
         setInterval(() => {
             if (!isTyping && !document.hidden) location.reload();
-        }, 3000);
+        }, 4000);
     </script>
 </body>
 </html>

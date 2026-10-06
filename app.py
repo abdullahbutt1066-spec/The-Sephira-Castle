@@ -9,6 +9,17 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-only-fallback-key")
 init_db()
 
 
+@app.context_processor
+def inject_nav_unread():
+    user = session.get("user")
+    if user:
+        try:
+            return {"nav_unread": msg_store.total_unread_for(user)}
+        except Exception:
+            return {"nav_unread": 0}
+    return {"nav_unread": 0}
+
+
 def current_user():
     return session.get("user")
 
@@ -278,6 +289,7 @@ def admin():
         members=listing,
         expulsions=expulsions,
         message=request.args.get("msg"),
+        is_fool=True,
     )
 
 
@@ -305,6 +317,172 @@ def admin_remove():
     auth.remove_member(target)
 
     return redirect(url_for("admin", msg=f"{target} has been expelled."))
+
+
+@app.route("/messages")
+def messages_list():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members:
+        session.pop("user", None)
+        return redirect(url_for("login"))
+
+    info = members[user]
+    is_fool = info.get("is_fool", False)
+
+    threads = msg_store.load_threads_for(user)
+
+    return render_template(
+        "messages.html",
+        title=auth.title_for(info["gender"]),
+        display=auth.display_name(user),
+        is_fool=is_fool,
+        threads=threads,
+    )
+
+
+@app.route("/messages/<int:thread_id>")
+def messages_thread(thread_id):
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members:
+        session.pop("user", None)
+        return redirect(url_for("login"))
+
+    if not msg_store.is_member_of_thread(thread_id, user):
+        return redirect(url_for("messages_list"))
+
+    info = members[user]
+    is_fool = info.get("is_fool", False)
+
+    thread = msg_store.load_thread(thread_id)
+    if not thread:
+        return redirect(url_for("messages_list"))
+
+    others = [p for p in thread["participants"] if p != user]
+    if len(others) == 1:
+        thread_title = others[0]
+    elif others:
+        thread_title = ", ".join(others)
+    else:
+        thread_title = "(empty)"
+
+    participants_str = ", ".join(thread["participants"])
+
+    raw = msg_store.load_dm_messages(thread_id, include_deleted=is_fool)
+
+    decorated = []
+    newest_id = 0
+    for m in raw:
+        sender = m.get("from", "")
+        s_info = members.get(sender)
+        if s_info:
+            s_title = auth.title_for(s_info["gender"])
+            s_display = auth.display_name(sender)
+        else:
+            s_title = ""
+            s_display = sender
+
+        decorated.append({
+            "id": m.get("id"),
+            "sender_title": s_title,
+            "sender_display": s_display,
+            "text": m.get("text", ""),
+            "time": m.get("time", ""),
+            "deleted": m.get("deleted", False),
+            "deleted_by": m.get("deleted_by", ""),
+            "deleted_at": m.get("deleted_at", ""),
+        })
+        if m.get("id") and m["id"] > newest_id:
+            newest_id = m["id"]
+
+    msg_store.mark_thread_read(thread_id, user, newest_id)
+
+    return render_template(
+        "messages_thread.html",
+        title=auth.title_for(info["gender"]),
+        display=auth.display_name(user),
+        is_fool=is_fool,
+        thread_id=thread_id,
+        thread_title=thread_title,
+        participants_str=participants_str,
+        messages=decorated,
+    )
+
+
+@app.route("/messages/<int:thread_id>/send", methods=["POST"])
+def messages_thread_send(thread_id):
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    if not msg_store.is_member_of_thread(thread_id, user):
+        return redirect(url_for("messages_list"))
+
+    text = request.form.get("text", "").strip()
+    if text:
+        msg_store.add_dm_message(thread_id, user, text)
+
+    return redirect(url_for("messages_thread", thread_id=thread_id))
+
+
+@app.route("/messages/<int:thread_id>/delete", methods=["POST"])
+def messages_thread_delete(thread_id):
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members or not members[user].get("is_fool"):
+        return redirect(url_for("messages_list"))
+
+    message_id = request.form.get("message_id", "").strip()
+    if message_id.isdigit():
+        msg_store.soft_delete_dm_message(int(message_id), deleted_by="The Fool")
+
+    return redirect(url_for("messages_thread", thread_id=thread_id))
+
+
+@app.route("/messages/new", methods=["GET", "POST"])
+def messages_new():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members or not members[user].get("is_fool"):
+        return redirect(url_for("messages_list"))
+
+    if request.method == "POST":
+        selected = request.form.getlist("members")
+        selected = [s for s in selected if s in members]
+        if selected:
+            thread_id = msg_store.create_thread(selected)
+            return redirect(url_for("messages_thread", thread_id=thread_id))
+
+    candidates = []
+    for name, info in members.items():
+        if info.get("is_fool"):
+            continue
+        candidates.append({
+            "codename": name,
+            "title": auth.title_for(info["gender"]),
+            "display": auth.display_name(name),
+        })
+
+    return render_template(
+        "messages_new.html",
+        title=auth.title_for(members[user]["gender"]),
+        display=auth.display_name(user),
+        is_fool=True,
+        candidates=candidates,
+    )
 
 
 @app.route("/logout")

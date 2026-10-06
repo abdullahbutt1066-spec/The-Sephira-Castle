@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Private Thread — Tarot Club</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background: #14121a;
+            color: #d8d4e0;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container { width: 100%; max-width: 480px; }
+        h1 { text-align: center; font-size: 1.5em; margin-bottom: 0.2em; }
+        .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
+        .topnav { text-align: center; margin-bottom: 30px; font-size: 0.9em; }
+        .topnav a { color: #a68fd6; text-decoration: none; margin: 0 10px; }
+        .topnav a:hover { color: #c4a8ff; }
+        .back { color: #a68fd6; text-decoration: none; font-size: 0.9em; display: inline-block; margin-bottom: 20px; }
+        .back:hover { color: #c4a8ff; }
+        fieldset {
+            background: #1e1b26;
+            border: 1px solid #3a3450;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        legend { color: #b8a8e0; padding: 0 10px; font-size: 0.95em; }
+        label {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+        label:hover { background: #252030; }
+        input[type="checkbox"] {
+            margin-right: 12px;
+            accent-color: #6a4fa3;
+            width: 18px;
+            height: 18px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #6a4fa3;
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:hover { background: #7d5fc0; }
+        .empty { color: #6a6380; font-style: italic; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topnav">
+            <a href="/members">Members</a> |
+            <a href="/chat">Gathering</a> |
+            <a href="/messages">Messages</a> |
+            <a href="/admin">Admin</a> |
+            <a href="/logout">Log out</a>
+        </div>
+
+        <a class="back" href="/messages">&larr; All conversations</a>
+
+        <h1>Begin a Private Thread</h1>
+        <p class="subtitle">Choose one or more members to include.</p>
+
+        <form method="post">
+            <fieldset>
+                <legend>Members</legend>
+                {% if candidates %}
+                    {% for c in candidates %}
+                        <label>
+                            <input type="checkbox" name="members" value="{{ c.codename }}">
+                            {{ c.title }} {{ c.display }}
+                        </label>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty">No members to include.</p>
+                {% endif %}
+            </fieldset>
+
+            <button type="submit">Open the Thread</button>
+        </form>
+    </div>
+</body>
+</html>

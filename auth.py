@@ -179,3 +179,12 @@ def load_expulsions():
                 {"codename": row[0], "expelled_by": row[1], "expelled_at": row[2]}
                 for row in cur.fetchall()
             ]
+
+
+def get_fool():
+    """Return The Fool's member dict, or None if no one has claimed The Fool."""
+    members = load_members()
+    for name, info in members.items():
+        if info.get("is_fool"):
+            return {"codename": name, **info}
+    return None

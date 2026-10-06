@@ -14,10 +14,7 @@
             display: flex;
             justify-content: center;
         }
-        .container {
-            width: 100%;
-            max-width: 720px;
-        }
+        .container { width: 100%; max-width: 720px; }
         h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
         .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
         .topnav { text-align: center; margin-bottom: 30px; font-size: 0.9em; }
@@ -64,6 +61,7 @@
         <div class="topnav">
             <a href="/members">Members</a> |
             <a href="/chat">Gathering</a> |
+            <a href="/messages">Messages{% if nav_unread %} ({{ nav_unread }}){% endif %}</a> |
             <a href="/admin">Admin</a> |
             <a href="/logout">Log out</a>
         </div>

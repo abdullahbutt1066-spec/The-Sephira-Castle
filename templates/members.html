@@ -15,8 +15,29 @@
         }
         h1 { font-size: 2em; margin-bottom: 0.3em; }
         .welcome { color: #8fd18f; font-size: 1.1em; margin-bottom: 40px; }
-        ul { list-style: none; padding: 0; }
-        li { margin: 8px 0; color: #b8b0c8; }
+        ul { list-style: none; padding: 0; max-width: 400px; margin: 0 auto; }
+        li {
+            margin: 10px 0;
+            padding: 12px 18px;
+            background: #1e1b26;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05em;
+        }
+        li .symbol {
+            font-size: 1.4em;
+            line-height: 1;
+        }
+        li .name {
+            font-weight: bold;
+        }
+        li .fool-star {
+            margin-left: auto;
+            color: #c4a8ff;
+            font-size: 0.85em;
+        }
         .topnav { margin-bottom: 30px; font-size: 0.9em; }
         .topnav a { color: #a68fd6; text-decoration: none; margin: 0 10px; }
         .topnav a:hover { color: #c4a8ff; }
@@ -35,8 +56,12 @@
     <p class="welcome">Welcome, {{ title }} {{ display }}.</p>
 
     <ul>
-    {% for member in members %}
-        <li>{{ member }}</li>
+    {% for m in members %}
+        <li>
+            <span class="symbol" style="color: {{ m.color }};">{{ m.symbol }}</span>
+            <span class="name" style="color: {{ m.color }};">{{ m.title }} {{ m.display }}</span>
+            {% if m.is_fool %}<span class="fool-star">✦</span>{% endif %}
+        </li>
     {% endfor %}
     </ul>
 </body>

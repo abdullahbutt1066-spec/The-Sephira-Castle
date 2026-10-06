@@ -29,6 +29,56 @@ CARDS = [
     "The World",
 ]
 
+CARD_SYMBOLS = {
+    "The Fool": "⚉",
+    "The Magician": "✦",
+    "The High Priestess": "☾",
+    "The Empress": "❀",
+    "The Emperor": "⛨",
+    "The Hierophant": "✟",
+    "The Lovers": "♡",
+    "The Chariot": "⚔",
+    "Strength": "⚜",
+    "The Hermit": "✧",
+    "Wheel of Fortune": "♾",
+    "Justice": "⚖",
+    "The Hanged Man": "✝",
+    "Death": "☠",
+    "Temperance": "⚗",
+    "The Devil": "⛧",
+    "The Tower": "♜",
+    "The Star": "★",
+    "The Moon": "☽",
+    "The Sun": "☀",
+    "Judgement": "⚒",
+    "The World": "⊕",
+}
+
+CARD_COLORS = {
+    "The Fool": "#c4a8ff",
+    "The Magician": "#7db8e8",
+    "The High Priestess": "#b0a8e0",
+    "The Empress": "#e8b0c4",
+    "The Emperor": "#e0c48a",
+    "The Hierophant": "#d4a0d4",
+    "The Lovers": "#f0a0b0",
+    "The Chariot": "#90a8e0",
+    "Strength": "#e0a870",
+    "The Hermit": "#8a9ab0",
+    "Wheel of Fortune": "#b8c878",
+    "Justice": "#c8d8e8",
+    "The Hanged Man": "#88b0a0",
+    "Death": "#706070",
+    "Temperance": "#a0d8c8",
+    "The Devil": "#a86088",
+    "The Tower": "#c87878",
+    "The Star": "#e8e878",
+    "The Moon": "#88a8d0",
+    "The Sun": "#f0b850",
+    "Judgement": "#d0a0c8",
+    "The World": "#88c8a0",
+}
+
 IP_LIMIT = 3
 DEVICE_LIMIT = 2
 
@@ -39,11 +89,13 @@ def load_members():
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT codename, salt, password, gender,
-                       is_fool, recovery_hash, device_tokens, ip
+                       is_fool, recovery_hash, device_tokens, ip,
+                       symbol, color
                 FROM members
             """)
             for row in cur.fetchall():
-                codename, salt, password, gender, is_fool, recovery_hash, device_tokens, ip = row
+                (codename, salt, password, gender, is_fool, recovery_hash,
+                 device_tokens, ip, symbol, color) = row
                 try:
                     tokens = json.loads(device_tokens) if device_tokens else []
                 except (json.JSONDecodeError, TypeError):
@@ -56,6 +108,8 @@ def load_members():
                     "recovery_hash": recovery_hash,
                     "device_tokens": tokens,
                     "ip": ip,
+                    "symbol": symbol,
+                    "color": color,
                 }
     return members
 
@@ -66,8 +120,9 @@ def save_members(members):
             for codename, info in members.items():
                 cur.execute("""
                     INSERT INTO members
-                        (codename, salt, password, gender, is_fool, recovery_hash, device_tokens, ip)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        (codename, salt, password, gender, is_fool, recovery_hash,
+                         device_tokens, ip, symbol, color)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (codename) DO UPDATE SET
                         salt = EXCLUDED.salt,
                         password = EXCLUDED.password,
@@ -75,7 +130,9 @@ def save_members(members):
                         is_fool = EXCLUDED.is_fool,
                         recovery_hash = EXCLUDED.recovery_hash,
                         device_tokens = EXCLUDED.device_tokens,
-                        ip = EXCLUDED.ip
+                        ip = EXCLUDED.ip,
+                        symbol = EXCLUDED.symbol,
+                        color = EXCLUDED.color
                 """, (
                     codename,
                     info["salt"],
@@ -85,6 +142,8 @@ def save_members(members):
                     info.get("recovery_hash"),
                     json.dumps(info.get("device_tokens", [])),
                     info.get("ip"),
+                    info.get("symbol"),
+                    info.get("color"),
                 ))
         conn.commit()
 
@@ -134,7 +193,6 @@ def make_device_token():
 
 
 def is_expelled(codename):
-    """Has this codename been permanently expelled?"""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT 1 FROM expelled_names WHERE codename = %s", (codename,))
@@ -142,7 +200,6 @@ def is_expelled(codename):
 
 
 def remove_member(codename):
-    """Delete a member from the members table."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM members WHERE codename = %s", (codename,))
@@ -150,7 +207,6 @@ def remove_member(codename):
 
 
 def record_expulsion(codename, expelled_by):
-    """Add to expulsions log and expelled_names tombstones."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -167,7 +223,6 @@ def record_expulsion(codename, expelled_by):
 
 
 def load_expulsions():
-    """Return list of all expulsions, newest first."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -182,9 +237,15 @@ def load_expulsions():
 
 
 def get_fool():
-    """Return The Fool's member dict, or None if no one has claimed The Fool."""
     members = load_members()
     for name, info in members.items():
         if info.get("is_fool"):
             return {"codename": name, **info}
     return None
+
+
+def get_card_decorations(codename):
+    """Return (symbol, color) for a given codename."""
+    symbol = CARD_SYMBOLS.get(codename, "·")
+    color = CARD_COLORS.get(codename, "#b8b0c8")
+    return symbol, color

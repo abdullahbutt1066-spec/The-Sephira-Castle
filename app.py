@@ -69,6 +69,7 @@ def register():
             message = "Don't try to impersonate someone else. Or else your consequences will be dire."
         else:
             salt = auth.make_salt()
+            symbol, color = auth.get_card_decorations(codename)
             entry = {
                 "salt": salt,
                 "password": auth.hash_password(password, salt),
@@ -77,6 +78,8 @@ def register():
                 "recovery_hash": None,
                 "device_tokens": [],
                 "ip": ip,
+                "symbol": symbol,
+                "color": color,
             }
             if is_fool_registration:
                 rec_salt = auth.make_salt()
@@ -180,7 +183,13 @@ def members():
 
     listing = []
     for name, m in all_members.items():
-        listing.append(f"{auth.title_for(m['gender'])} {auth.display_name(name)}")
+        listing.append({
+            "title": auth.title_for(m["gender"]),
+            "display": auth.display_name(name),
+            "symbol": m.get("symbol") or "·",
+            "color": m.get("color") or "#b8b0c8",
+            "is_fool": m.get("is_fool", False),
+        })
 
     return render_template(
         "members.html",
@@ -222,14 +231,20 @@ def chat():
         if sender_info:
             sender_title = auth.title_for(sender_info["gender"])
             sender_display = auth.display_name(sender)
+            sender_symbol = sender_info.get("symbol") or "·"
+            sender_color = sender_info.get("color") or "#b8b0c8"
         else:
             sender_title = ""
             sender_display = sender
+            sender_symbol = "·"
+            sender_color = "#b8b0c8"
 
         decorated.append({
             "id": m.get("id"),
             "sender_title": sender_title,
             "sender_display": sender_display,
+            "sender_symbol": sender_symbol,
+            "sender_color": sender_color,
             "text": m.get("text", ""),
             "time": m.get("time", ""),
             "deleted": m.get("deleted", False),
@@ -385,14 +400,20 @@ def messages_thread(thread_id):
         if s_info:
             s_title = auth.title_for(s_info["gender"])
             s_display = auth.display_name(sender)
+            s_symbol = s_info.get("symbol") or "·"
+            s_color = s_info.get("color") or "#b8b0c8"
         else:
             s_title = ""
             s_display = sender
+            s_symbol = "·"
+            s_color = "#b8b0c8"
 
         decorated.append({
             "id": m.get("id"),
             "sender_title": s_title,
             "sender_display": s_display,
+            "sender_symbol": s_symbol,
+            "sender_color": s_color,
             "text": m.get("text", ""),
             "time": m.get("time", ""),
             "deleted": m.get("deleted", False),

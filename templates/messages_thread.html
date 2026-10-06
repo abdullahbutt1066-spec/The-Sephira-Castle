@@ -40,13 +40,16 @@
         .message:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .meta {
             font-size: 0.85em;
-            color: #8a7fb0;
             margin-bottom: 4px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .meta .name { color: #b8a8e0; font-weight: bold; }
+        .meta .symbol {
+            font-size: 1.3em;
+            line-height: 1;
+        }
+        .meta .name { font-weight: bold; }
         .meta .time { color: #6a6380; }
         .meta .spacer { flex: 1; }
         .meta form { margin: 0; }
@@ -64,12 +67,8 @@
         .text { color: #d8d4e0; line-height: 1.4; white-space: pre-wrap; }
         .message.deleted .text { color: #6a6380; text-decoration: line-through; font-style: italic; }
         .message.deleted .meta .name { color: #6a6380; }
-        .deleted-note {
-            font-size: 0.75em;
-            color: #8a3a4a;
-            margin-top: 4px;
-            font-style: italic;
-        }
+        .message.deleted .meta .symbol { opacity: 0.4; }
+        .deleted-note { font-size: 0.75em; color: #8a3a4a; margin-top: 4px; font-style: italic; }
         .empty { color: #6a6380; text-align: center; font-style: italic; }
         form.new-message { display: flex; gap: 10px; }
         input[type="text"] {
@@ -116,7 +115,8 @@
                 {% for m in messages %}
                     <div class="message {% if m.deleted %}deleted{% endif %}">
                         <div class="meta">
-                            <span class="name">{{ m.sender_title }} {{ m.sender_display }}</span>
+                            <span class="symbol" style="color: {{ m.sender_color }};">{{ m.sender_symbol }}</span>
+                            <span class="name" style="color: {{ m.sender_color }};">{{ m.sender_title }} {{ m.sender_display }}</span>
                             <span class="time">{{ m.time }}</span>
                             <span class="spacer"></span>
                             {% if is_fool and not m.deleted %}

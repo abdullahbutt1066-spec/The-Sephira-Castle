@@ -5,34 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin — Tarot Club</title>
     <style>
+        :root { --accent: {{ user_color }}; }
         body {
             font-family: Georgia, serif;
-            background: #14121a;
+            background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
             color: #d8d4e0;
             margin: 0;
             padding: 40px 20px;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
         .container { width: 100%; max-width: 720px; }
         h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
         .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
         .topnav { text-align: center; margin-bottom: 30px; font-size: 0.9em; }
-        .topnav a { color: #a68fd6; text-decoration: none; margin: 0 10px; }
-        .topnav a:hover { color: #c4a8ff; }
-        h2 { font-size: 1.1em; color: #b8a8e0; margin-top: 30px; border-bottom: 1px solid #2a2536; padding-bottom: 6px; }
+        .topnav a { color: var(--accent); text-decoration: none; margin: 0 10px; }
+        .topnav a:hover { filter: brightness(1.3); }
+        h2 {
+            font-size: 1.1em;
+            color: var(--accent);
+            margin-top: 30px;
+            border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, #2a2536 80%);
+            padding-bottom: 6px;
+        }
         .member-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 12px;
-            background: #1e1b26;
-            border: 1px solid #2a2536;
+            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
+            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
             border-radius: 6px;
             margin-bottom: 8px;
         }
         .member-name { color: #d8d4e0; }
-        .fool-tag { color: #c4a8ff; font-size: 0.85em; margin-left: 8px; }
+        .fool-tag { color: var(--accent); font-size: 0.85em; margin-left: 8px; }
         button.remove {
             background: #5a2a3a;
             color: #f0c8c8;
@@ -47,7 +55,7 @@
         .empty { color: #6a6380; font-style: italic; text-align: center; padding: 12px; }
         .expulsion {
             padding: 8px 12px;
-            background: #1e1b26;
+            background: color-mix(in srgb, #8a3a4a 15%, #1a1724 85%);
             border-left: 3px solid #8a3a4a;
             margin-bottom: 6px;
             font-size: 0.9em;

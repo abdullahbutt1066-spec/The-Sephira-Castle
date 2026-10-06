@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register — Tarot Club</title>
     <style>
+        :root { --accent: {{ user_color }}; }
         body {
             font-family: Georgia, serif;
-            background: #14121a;
+            background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
             color: #d8d4e0;
             display: flex;
             justify-content: center;
@@ -17,9 +18,9 @@
             padding: 20px;
         }
         .card {
-            background: #1e1b26;
+            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
             padding: 40px 50px;
-            border: 1px solid #3a3450;
+            border: 1px solid color-mix(in srgb, var(--accent) 20%, #3a3450 80%);
             border-radius: 8px;
             width: 340px;
         }
@@ -40,19 +41,22 @@
             width: 100%;
             margin-top: 22px;
             padding: 10px;
-            background: #6a4fa3;
+            background: var(--accent);
             border: none;
             color: #fff;
             border-radius: 4px;
             font-size: 1em;
             cursor: pointer;
+            font-family: inherit;
         }
-        button:hover { background: #7d5fc0; }
+        button:hover { filter: brightness(1.2); }
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; }
         .msg.ok  { color: #8fd18f; }
         .msg.err { color: #d18f8f; }
         .hidden { display: none; }
         .hint { font-size: 0.75em; color: #6a6380; margin-top: 4px; }
+        .link { text-align: center; margin-top: 20px; font-size: 0.85em; }
+        a { color: var(--accent); text-decoration: none; }
     </style>
 </head>
 <body>
@@ -91,6 +95,8 @@
 
             <button type="submit">Register</button>
         </form>
+
+        <p class="link">Already a member? <a href="/login">Log in</a></p>
     </div>
 
     <script>

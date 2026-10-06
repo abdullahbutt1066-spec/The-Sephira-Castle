@@ -20,6 +20,20 @@ def inject_nav_unread():
     return {"nav_unread": 0}
 
 
+@app.context_processor
+def inject_user_color():
+    user = session.get("user")
+    if user:
+        try:
+            members = auth.load_members()
+            info = members.get(user)
+            if info and info.get("color"):
+                return {"user_color": info["color"]}
+        except Exception:
+            pass
+    return {"user_color": "#6a4fa3"}
+
+
 def current_user():
     return session.get("user")
 

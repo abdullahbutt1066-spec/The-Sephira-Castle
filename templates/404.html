@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost — The Sephira Castle</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
+    <style>
+        :root { --accent: {{ user_color }}; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: Georgia, serif;
+            background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
+            color: #d8d4e0;
+            text-align: center;
+            padding: 80px 20px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h1 { font-size: 4em; color: var(--accent); margin: 0; letter-spacing: 4px; }
+        h2 { font-size: 1.4em; margin-top: 0.3em; font-weight: normal; color: #b8b0c8; }
+        p { color: #8a7fb0; font-size: 1em; margin-top: 10px; }
+        nav { margin-top: 40px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+        nav a {
+            display: inline-block;
+            padding: 12px 28px;
+            font-size: 1em;
+            font-family: inherit;
+            text-decoration: none;
+            color: #fff;
+            background: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 6px;
+        }
+        nav a:hover { filter: brightness(1.2); }
+        nav a.secondary { background: transparent; color: var(--accent); }
+        nav a.secondary:hover { background: color-mix(in srgb, var(--accent) 15%, transparent 85%); color: #fff; }
+        @media (max-width: 600px) {
+            body { padding: 40px 16px; }
+            h1 { font-size: 3em; }
+            h2 { font-size: 1.15em; }
+            nav { flex-direction: column; align-items: stretch; }
+            nav a { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>404</h1>
+        <h2>This corridor does not exist.</h2>
+        <p>The Sephira Castle has no such chamber.</p>
+        <nav aria-label="Main navigation">
+            <a href="/">Return home</a>
+            <a href="/login" class="secondary">Log in</a>
+        </nav>
+    </main>
+</body>
+</html>
+

@@ -1,4 +1,5 @@
 ﻿import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, make_response
 import auth
 import messages as msg_store
@@ -7,6 +8,32 @@ from db import init_db
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-fallback-key")
 init_db()
+
+
+def relative_time(timestamp_str):
+    """Convert '2026-10-07 15:30' into 'just now', '5 min ago', etc."""
+    try:
+        then = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M")
+    except (ValueError, TypeError):
+        return timestamp_str
+
+    seconds = (datetime.now() - then).total_seconds()
+
+    if seconds < 0:
+        return timestamp_str
+    elif seconds < 60:
+        return "just now"
+    elif seconds < 3600:
+        return f"{int(seconds // 60)} min ago"
+    elif seconds < 86400:
+        return f"{int(seconds // 3600)} h ago"
+    elif seconds < 604800:
+        return f"{int(seconds // 86400)} d ago"
+    else:
+        return timestamp_str
+
+
+app.jinja_env.filters["reltime"] = relative_time
 
 
 @app.context_processor
@@ -599,6 +626,11 @@ def messages_new():
 def logout():
     session.pop("user", None)
     return redirect(url_for("login"))
+
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("404.html"), 404
 
 
 if __name__ == "__main__":

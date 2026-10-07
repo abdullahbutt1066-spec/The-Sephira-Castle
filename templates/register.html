@@ -6,6 +6,7 @@
     <title>Register — Tarot Club</title>
     <style>
         :root { --accent: {{ user_color }}; }
+        * { box-sizing: border-box; }
         body {
             font-family: Georgia, serif;
             background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
@@ -23,24 +24,24 @@
             border: 1px solid color-mix(in srgb, var(--accent) 20%, #3a3450 80%);
             border-radius: 8px;
             width: 340px;
+            max-width: 100%;
         }
         h1 { text-align: center; font-size: 1.5em; margin-top: 0; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
         input, select {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             background: #14121a;
             border: 1px solid #3a3450;
             color: #d8d4e0;
             border-radius: 4px;
-            box-sizing: border-box;
             font-family: inherit;
             font-size: 1em;
         }
         button {
             width: 100%;
             margin-top: 22px;
-            padding: 10px;
+            padding: 12px;
             background: var(--accent);
             border: none;
             color: #fff;
@@ -57,6 +58,12 @@
         .hint { font-size: 0.75em; color: #6a6380; margin-top: 4px; }
         .link { text-align: center; margin-top: 20px; font-size: 0.85em; }
         a { color: var(--accent); text-decoration: none; }
+
+        @media (max-width: 600px) {
+            body { padding: 16px; }
+            .card { padding: 30px 24px; width: 100%; }
+            h1 { font-size: 1.3em; }
+        }
     </style>
 </head>
 <body>
@@ -91,6 +98,10 @@
                 <label for="recovery_password">Recovery Password</label>
                 <input type="password" id="recovery_password" name="recovery_password">
                 <p class="hint">Only The Fool has a recovery password. Choose carefully — it cannot be changed.</p>
+
+                <label for="email">Recovery Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com">
+                <p class="hint">Used only to reset your recovery password. Must be pre-registered.</p>
             </div>
 
             <button type="submit">Register</button>
@@ -103,14 +114,17 @@
         const codenameSelect = document.getElementById('codename');
         const recoveryBlock = document.getElementById('recovery-block');
         const recoveryInput = document.getElementById('recovery_password');
+        const emailInput = document.getElementById('email');
 
         codenameSelect.addEventListener('change', () => {
             if (codenameSelect.value === 'The Fool') {
                 recoveryBlock.classList.remove('hidden');
                 recoveryInput.required = true;
+                emailInput.required = true;
             } else {
                 recoveryBlock.classList.add('hidden');
                 recoveryInput.required = false;
+                emailInput.required = false;
             }
         });
     </script>

@@ -90,12 +90,12 @@ def load_members():
             cur.execute("""
                 SELECT codename, salt, password, gender,
                        is_fool, recovery_hash, device_tokens, ip,
-                       symbol, color
+                       symbol, color, email
                 FROM members
             """)
             for row in cur.fetchall():
                 (codename, salt, password, gender, is_fool, recovery_hash,
-                 device_tokens, ip, symbol, color) = row
+                 device_tokens, ip, symbol, color, email) = row
                 try:
                     tokens = json.loads(device_tokens) if device_tokens else []
                 except (json.JSONDecodeError, TypeError):
@@ -110,6 +110,7 @@ def load_members():
                     "ip": ip,
                     "symbol": symbol,
                     "color": color,
+                    "email": email,
                 }
     return members
 
@@ -121,8 +122,8 @@ def save_members(members):
                 cur.execute("""
                     INSERT INTO members
                         (codename, salt, password, gender, is_fool, recovery_hash,
-                         device_tokens, ip, symbol, color)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                         device_tokens, ip, symbol, color, email)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (codename) DO UPDATE SET
                         salt = EXCLUDED.salt,
                         password = EXCLUDED.password,
@@ -132,7 +133,8 @@ def save_members(members):
                         device_tokens = EXCLUDED.device_tokens,
                         ip = EXCLUDED.ip,
                         symbol = EXCLUDED.symbol,
-                        color = EXCLUDED.color
+                        color = EXCLUDED.color,
+                        email = EXCLUDED.email
                 """, (
                     codename,
                     info["salt"],
@@ -144,6 +146,7 @@ def save_members(members):
                     info.get("ip"),
                     info.get("symbol"),
                     info.get("color"),
+                    info.get("email"),
                 ))
         conn.commit()
 
@@ -245,7 +248,6 @@ def get_fool():
 
 
 def get_card_decorations(codename):
-    """Return (symbol, color) for a given codename."""
     symbol = CARD_SYMBOLS.get(codename, "·")
     color = CARD_COLORS.get(codename, "#b8b0c8")
     return symbol, color

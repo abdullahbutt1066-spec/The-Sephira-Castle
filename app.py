@@ -60,6 +60,7 @@ def register():
         gender   = request.form.get("gender", "").strip().lower()
         password = request.form.get("password", "").strip()
         recovery = request.form.get("recovery_password", "").strip()
+        email    = request.form.get("email", "").strip().lower()
 
         members = auth.load_members()
         is_fool_registration = (codename == "The Fool")
@@ -79,6 +80,10 @@ def register():
             message = "The Fool must set a recovery password."
         elif is_fool_registration and recovery == password:
             message = "Recovery password must be different from your login password."
+        elif is_fool_registration and not email:
+            message = "The Fool must provide a recovery email."
+        elif is_fool_registration and "@" not in email:
+            message = "Please enter a valid email address."
         elif not is_fool_registration and auth.count_registrations_from_ip(ip) >= auth.IP_LIMIT:
             message = "Don't try to impersonate someone else. Or else your consequences will be dire."
         else:
@@ -94,10 +99,12 @@ def register():
                 "ip": ip,
                 "symbol": symbol,
                 "color": color,
+                "email": None,
             }
             if is_fool_registration:
                 rec_salt = auth.make_salt()
                 entry["recovery_hash"] = auth.hash_password(recovery, rec_salt) + ":" + rec_salt
+                entry["email"] = email
             members[codename] = entry
             auth.save_members(members)
             message = f"Welcome to the club, {auth.title_for(gender)} {auth.display_name(codename)}."
@@ -178,6 +185,74 @@ def fool_bind():
             return resp
 
     return render_template("fool_bind.html", message=message)
+
+
+@app.route("/fool-recover", methods=["GET", "POST"])
+def fool_recover():
+    message = None
+    success = False
+
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+
+        members = auth.load_members()
+        fool = None
+        for name, info in members.items():
+            if info.get("is_fool"):
+                fool = {"codename": name, **info}
+                break
+
+        if not fool or not fool.get("email"):
+            message = "If that email is registered, a code has been sent."
+            success = True
+        elif fool["email"] != email:
+            message = "If that email is registered, a code has been sent."
+            success = True
+        else:
+            import otp as otp_store
+            code = otp_store.create_otp(fool["codename"])
+            sent = otp_store.send_otp_email(email, code)
+            if sent:
+                session["fool_recover_codename"] = fool["codename"]
+                session["fool_recover_email"] = email
+                return redirect(url_for("fool_recover_verify"))
+            else:
+                message = "Could not send the email. Try again later."
+
+    return render_template("fool_recover.html", message=message, success=success)
+
+
+@app.route("/fool-recover-verify", methods=["GET", "POST"])
+def fool_recover_verify():
+    codename = session.get("fool_recover_codename")
+    if not codename:
+        return redirect(url_for("fool_recover"))
+
+    message = None
+
+    if request.method == "POST":
+        code = request.form.get("code", "").strip()
+        new_recovery = request.form.get("new_recovery", "").strip()
+
+        import otp as otp_store
+
+        if not new_recovery:
+            message = "New recovery password cannot be empty."
+        elif not otp_store.verify_otp(codename, code):
+            message = "That code is invalid or has expired."
+        else:
+            members = auth.load_members()
+            if codename in members:
+                rec_salt = auth.make_salt()
+                members[codename]["recovery_hash"] = auth.hash_password(new_recovery, rec_salt) + ":" + rec_salt
+                auth.save_members(members)
+                session.pop("fool_recover_codename", None)
+                session.pop("fool_recover_email", None)
+                return redirect(url_for("login"))
+
+            message = "Something went wrong. Try again."
+
+    return render_template("fool_recover_verify.html", message=message)
 
 
 @app.route("/members")

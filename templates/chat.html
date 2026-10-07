@@ -3,61 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Gathering — Tarot Club</title>
+    <title>The Gathering — The Sephiroth Castle</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
-        body {
-            font-family: Georgia, serif;
-            background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
-            color: #d8d4e0;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
+        body { font-family: Georgia, serif; background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%); color: #d8d4e0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 720px; }
         h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
         .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
-        .messages {
-            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
-            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
-            border-radius: 8px;
-            padding: 20px;
-            min-height: 300px;
-            max-height: 500px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-        .message {
-            margin-bottom: 14px;
-            padding: 12px 16px;
-            border-radius: 8px;
-        }
-        .meta {
-            font-size: 0.85em;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .messages { background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 8px; padding: 20px; min-height: 300px; max-height: 500px; overflow-y: auto; margin-bottom: 20px; }
+        .message { margin-bottom: 14px; padding: 12px 16px; border-radius: 8px; }
+        .meta { font-size: 0.85em; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .meta .symbol { font-size: 1.3em; line-height: 1; }
         .meta .name { font-weight: bold; }
         .meta .time { color: #6a6380; }
         .meta .spacer { flex: 1; }
         .meta form { margin: 0; }
-        .meta button.delete {
-            background: transparent;
-            border: 1px solid #5a2a3a;
-            color: #c48f8f;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 0.85em;
-            cursor: pointer;
-            font-family: inherit;
-        }
+        .meta button.delete { background: transparent; border: 1px solid #5a2a3a; color: #c48f8f; padding: 2px 8px; border-radius: 3px; font-size: 0.85em; cursor: pointer; font-family: inherit; }
         .meta button.delete:hover { background: #5a2a3a; color: #f0c8c8; }
         .text { color: #e0dce8; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; }
         .message.deleted .text { color: #6a6380; text-decoration: line-through; font-style: italic; }
@@ -66,34 +29,13 @@
         .deleted-note { font-size: 0.75em; color: #8a3a4a; margin-top: 4px; font-style: italic; }
         .empty { color: #6a6380; text-align: center; font-style: italic; }
         form.new-message { display: flex; gap: 10px; }
-        input[type="text"] {
-            flex: 1;
-            padding: 12px;
-            background: #1a1724;
-            border: 1px solid #3a3450;
-            color: #d8d4e0;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 1em;
-            min-width: 0;
-        }
+        input[type="text"] { flex: 1; padding: 12px; background: #1a1724; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 6px; font-family: inherit; font-size: 1em; min-width: 0; }
         input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-        button.send {
-            padding: 12px 24px;
-            background: var(--accent);
-            border: none;
-            color: #fff;
-            border-radius: 6px;
-            font-size: 1em;
-            cursor: pointer;
-            font-family: inherit;
-            flex-shrink: 0;
-        }
+        button.send { padding: 12px 24px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0; }
         button.send:hover { filter: brightness(1.2); }
         .topnav { text-align: center; margin-bottom: 24px; font-size: 0.9em; line-height: 1.8; }
         .topnav a { color: var(--accent); text-decoration: none; margin: 0 6px; }
         .topnav a:hover { filter: brightness(1.3); }
-
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.4em; }
@@ -118,45 +60,37 @@
             {% if is_fool %}<a href="/admin">Admin</a> |{% endif %}
             <a href="/logout">Log out</a>
         </div>
-
         <h1>The Gathering</h1>
         <p class="subtitle">You speak as {{ title }} {{ display }}.</p>
-
         <div class="messages">
             {% if messages %}
                 {% for m in messages %}
-                    <div class="message {% if m.deleted %}deleted{% endif %}"
-                         style="border-left: 3px solid {{ m.sender_color }}; background: {{ m.sender_color }}18;">
+                    <div class="message {% if m.deleted %}deleted{% endif %}" style="border-left: 3px solid {{ m.sender_color }}; background: {{ m.sender_color }}18;">
                         <div class="meta">
                             <span class="symbol" style="color: {{ m.sender_color }};">{{ m.sender_symbol }}</span>
                             <span class="name" style="color: {{ m.sender_color }};">{{ m.sender_title }} {{ m.sender_display }}</span>
                             <span class="time">{{ m.time }}</span>
                             <span class="spacer"></span>
                             {% if is_fool and not m.deleted %}
-                                <form method="post" action="/chat/delete"
-                                      onsubmit="return confirm('Delete this message?');">
+                                <form method="post" action="/chat/delete" onsubmit="return confirm('Delete this message?');">
                                     <input type="hidden" name="message_id" value="{{ m.id }}">
                                     <button type="submit" class="delete">Delete</button>
                                 </form>
                             {% endif %}
                         </div>
                         <div class="text">{{ m.text }}</div>
-                        {% if m.deleted and is_fool %}
-                            <div class="deleted-note">Deleted by {{ m.deleted_by }} at {{ m.deleted_at }}</div>
-                        {% endif %}
+                        {% if m.deleted and is_fool %}<div class="deleted-note">Deleted by {{ m.deleted_by }} at {{ m.deleted_at }}</div>{% endif %}
                     </div>
                 {% endfor %}
             {% else %}
                 <p class="empty">The gathering is silent. Speak, and it shall begin.</p>
             {% endif %}
         </div>
-
         <form method="post" class="new-message">
             <input type="text" name="text" placeholder="Speak your mind..." autocomplete="off" autofocus required>
             <button type="submit" class="send">Send</button>
         </form>
     </div>
-
     <script>
         let isTyping = false;
         const input = document.querySelector('input[name="text"]');

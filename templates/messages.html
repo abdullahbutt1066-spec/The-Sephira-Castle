@@ -3,20 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messages — Tarot Club</title>
+    <title>Messages — The Sephiroth Castle</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
-        body {
-            font-family: Georgia, serif;
-            background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
-            color: #d8d4e0;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
+        body { font-family: Georgia, serif; background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%); color: #d8d4e0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 640px; }
         h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
         .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
@@ -24,46 +16,17 @@
         .topnav a { color: var(--accent); text-decoration: none; margin: 0 6px; }
         .topnav a:hover { filter: brightness(1.3); }
         .thread-list { list-style: none; padding: 0; margin: 0; }
-        .thread-item {
-            display: block;
-            padding: 16px 20px;
-            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
-            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            text-decoration: none;
-            color: #d8d4e0;
-            transition: border-color 0.15s, filter 0.15s;
-        }
+        .thread-item { display: block; padding: 16px 20px; background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 8px; margin-bottom: 10px; text-decoration: none; color: #d8d4e0; transition: border-color 0.15s, filter 0.15s; }
         .thread-item:hover { border-color: var(--accent); filter: brightness(1.1); }
         .thread-row1 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 8px; }
         .thread-title { font-size: 1.05em; color: var(--accent); font-weight: bold; word-break: break-word; }
-        .thread-badge {
-            background: var(--accent);
-            color: #fff;
-            border-radius: 10px;
-            padding: 2px 10px;
-            font-size: 0.8em;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
+        .thread-badge { background: var(--accent); color: #fff; border-radius: 10px; padding: 2px 10px; font-size: 0.8em; font-weight: bold; flex-shrink: 0; }
         .thread-row2 { display: flex; justify-content: space-between; font-size: 0.85em; color: #6a6380; gap: 8px; }
         .thread-preview { color: #8a7fb0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
         .thread-time { color: #5a5560; flex-shrink: 0; }
         .empty { text-align: center; color: #6a6380; font-style: italic; padding: 30px 0; }
-        .new-thread {
-            display: block;
-            text-align: center;
-            margin-top: 30px;
-            padding: 14px;
-            background: var(--accent);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 1em;
-        }
+        .new-thread { display: block; text-align: center; margin-top: 30px; padding: 14px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 6px; font-size: 1em; }
         .new-thread:hover { filter: brightness(1.2); }
-
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.4em; }
@@ -85,10 +48,8 @@
             {% if is_fool %}<a href="/admin">Admin</a> |{% endif %}
             <a href="/logout">Log out</a>
         </div>
-
         <h1>Private Conversations</h1>
         <p class="subtitle">You speak as {{ title }} {{ display }}.</p>
-
         {% if threads %}
             <ul class="thread-list">
                 {% for t in threads %}
@@ -107,18 +68,13 @@
         {% else %}
             <p class="empty">
                 {% if is_fool %}
-                    You have not yet opened a private conversation.<br>
-                    Choose a member to begin.
+                    You have not yet opened a private conversation.<br>Choose a member to begin.
                 {% else %}
-                    You have no private conversations.<br>
-                    If you wish to speak with The Fool, say so in the Gathering.
+                    You have no private conversations.<br>If you wish to speak with The Fool, say so in the Gathering.
                 {% endif %}
             </p>
         {% endif %}
-
-        {% if is_fool %}
-            <a class="new-thread" href="/messages/new">+ Begin a New Private Thread</a>
-        {% endif %}
+        {% if is_fool %}<a class="new-thread" href="/messages/new">+ Begin a New Private Thread</a>{% endif %}
     </div>
 </body>
 </html>

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarot Club</title>
+    <title>The Sephiroth Castle</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
@@ -31,21 +32,9 @@
             border-radius: 6px;
             transition: filter 0.15s;
         }
-        nav a:hover, nav a:focus {
-            filter: brightness(1.2);
-            outline: 3px solid var(--accent);
-            outline-offset: 3px;
-        }
-        nav a.secondary {
-            background: transparent;
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-        nav a.secondary:hover, nav a.secondary:focus {
-            background: color-mix(in srgb, var(--accent) 15%, transparent 85%);
-            color: #fff;
-        }
-
+        nav a:hover, nav a:focus { filter: brightness(1.2); outline: 3px solid var(--accent); outline-offset: 3px; }
+        nav a.secondary { background: transparent; color: var(--accent); border-color: var(--accent); }
+        nav a.secondary:hover, nav a.secondary:focus { background: color-mix(in srgb, var(--accent) 15%, transparent 85%); color: #fff; }
         @media (max-width: 600px) {
             body { padding: 40px 16px; }
             h1 { font-size: 1.9em; }
@@ -57,11 +46,10 @@
 </head>
 <body>
     <main>
-        <h1>Welcome to the Tarot Club</h1>
+        <h1>Welcome to The Sephiroth Castle</h1>
         <p>The gathering is not yet in session.</p>
-
         <nav aria-label="Main navigation">
-            <a href="/register">Enter the Club</a>
+            <a href="/register">Enter the Castle</a>
             <a href="/login" class="secondary">Already a member?</a>
         </nav>
     </main>

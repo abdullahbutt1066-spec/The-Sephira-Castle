@@ -3,20 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Private Thread — Tarot Club</title>
+    <title>New Private Thread — The Sephiroth Castle</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
-        body {
-            font-family: Georgia, serif;
-            background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
-            color: #d8d4e0;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
+        body { font-family: Georgia, serif; background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%); color: #d8d4e0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 480px; }
         h1 { text-align: center; font-size: 1.5em; margin-bottom: 0.2em; }
         .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
@@ -25,44 +17,14 @@
         .topnav a:hover { filter: brightness(1.3); }
         .back { color: var(--accent); text-decoration: none; font-size: 0.9em; display: inline-block; margin-bottom: 20px; }
         .back:hover { filter: brightness(1.3); }
-        fieldset {
-            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
-            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+        fieldset { background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
         legend { color: var(--accent); padding: 0 10px; font-size: 0.95em; }
-        label {
-            display: flex;
-            align-items: center;
-            padding: 10px 12px;
-            cursor: pointer;
-            border-radius: 4px;
-            margin-bottom: 4px;
-        }
+        label { display: flex; align-items: center; padding: 10px 12px; cursor: pointer; border-radius: 4px; margin-bottom: 4px; }
         label:hover { background: color-mix(in srgb, var(--accent) 12%, transparent 88%); }
-        input[type="checkbox"] {
-            margin-right: 12px;
-            accent-color: var(--accent);
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent);
-            border: none;
-            color: #fff;
-            border-radius: 6px;
-            font-size: 1em;
-            cursor: pointer;
-            font-family: inherit;
-        }
+        input[type="checkbox"] { margin-right: 12px; accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+        button { width: 100%; padding: 14px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; }
         button:hover { filter: brightness(1.2); }
         .empty { color: #6a6380; font-style: italic; text-align: center; }
-
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.3em; }
@@ -83,12 +45,9 @@
             <a href="/admin">Admin</a> |
             <a href="/logout">Log out</a>
         </div>
-
         <a class="back" href="/messages">&larr; All conversations</a>
-
         <h1>Begin a Private Thread</h1>
         <p class="subtitle">Choose one or more members to include.</p>
-
         <form method="post">
             <fieldset>
                 <legend>Members</legend>
@@ -99,11 +58,8 @@
                             {{ c.title }} {{ c.display }}
                         </label>
                     {% endfor %}
-                {% else %}
-                    <p class="empty">No members to include.</p>
-                {% endif %}
+                {% else %}<p class="empty">No members to include.</p>{% endif %}
             </fieldset>
-
             <button type="submit">Open the Thread</button>
         </form>
     </div>

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recover — Tarot Club</title>
+    <title>Recover — The Sephiroth Castle</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
@@ -29,35 +30,14 @@
         h1 { text-align: center; font-size: 1.4em; margin-top: 0; }
         p { color: #b8b0c8; font-size: 0.9em; text-align: center; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
-        input {
-            width: 100%;
-            padding: 10px;
-            background: #14121a;
-            border: 1px solid #3a3450;
-            color: #d8d4e0;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 1em;
-        }
-        button {
-            width: 100%;
-            margin-top: 22px;
-            padding: 12px;
-            background: var(--accent);
-            border: none;
-            color: #fff;
-            border-radius: 4px;
-            font-size: 1em;
-            cursor: pointer;
-            font-family: inherit;
-        }
+        input { width: 100%; padding: 10px; background: #14121a; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 4px; font-family: inherit; font-size: 1em; }
+        button { width: 100%; margin-top: 22px; padding: 12px; background: var(--accent); border: none; color: #fff; border-radius: 4px; font-size: 1em; cursor: pointer; font-family: inherit; }
         button:hover { filter: brightness(1.2); }
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; }
         .msg.ok { color: #8fd18f; }
         .msg.err { color: #d18f8f; }
         .link { text-align: center; margin-top: 20px; font-size: 0.85em; }
         a { color: var(--accent); text-decoration: none; }
-
         @media (max-width: 600px) {
             body { padding: 16px; }
             .card { padding: 30px 24px; width: 100%; }
@@ -69,18 +49,12 @@
     <div class="card">
         <h1>Recover The Fool's Recovery Password</h1>
         <p>Enter your pre-registered email to receive a one-time code.</p>
-
-        {% if message %}
-            <p class="msg {{ 'ok' if success else 'err' }}">{{ message }}</p>
-        {% endif %}
-
+        {% if message %}<p class="msg {{ 'ok' if success else 'err' }}">{{ message }}</p>{% endif %}
         <form method="post">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required autofocus>
-
             <button type="submit">Send Code</button>
         </form>
-
         <p class="link"><a href="/login">Back to login</a></p>
     </div>
 </body>

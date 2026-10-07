@@ -3,69 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — Tarot Club</title>
+    <title>The Fool's Chamber — The Sephiroth Castle</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
-        body {
-            font-family: Georgia, serif;
-            background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
-            color: #d8d4e0;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
+        body { font-family: Georgia, serif; background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%); color: #d8d4e0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 720px; }
         h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
         .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
         .topnav { text-align: center; margin-bottom: 30px; font-size: 0.9em; line-height: 1.8; }
         .topnav a { color: var(--accent); text-decoration: none; margin: 0 6px; }
         .topnav a:hover { filter: brightness(1.3); }
-        h2 {
-            font-size: 1.1em;
-            color: var(--accent);
-            margin-top: 30px;
-            border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, #2a2536 80%);
-            padding-bottom: 6px;
-        }
-        .member-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
-            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
-            border-radius: 6px;
-            margin-bottom: 8px;
-            gap: 10px;
-        }
+        h2 { font-size: 1.1em; color: var(--accent); margin-top: 30px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, #2a2536 80%); padding-bottom: 6px; }
+        .member-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 6px; margin-bottom: 8px; gap: 10px; }
         .member-name { color: #d8d4e0; flex: 1; }
         .fool-tag { color: var(--accent); font-size: 0.85em; margin-left: 8px; }
-        button.remove {
-            background: #5a2a3a;
-            color: #f0c8c8;
-            border: 1px solid #8a3a4a;
-            padding: 8px 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.85em;
-            flex-shrink: 0;
-        }
+        button.remove { background: #5a2a3a; color: #f0c8c8; border: 1px solid #8a3a4a; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.85em; flex-shrink: 0; }
         button.remove:hover { background: #7a3a4a; }
         .empty { color: #6a6380; font-style: italic; text-align: center; padding: 12px; }
-        .expulsion {
-            padding: 8px 12px;
-            background: color-mix(in srgb, #8a3a4a 15%, #1a1724 85%);
-            border-left: 3px solid #8a3a4a;
-            margin-bottom: 6px;
-            font-size: 0.9em;
-            color: #b8b0c8;
-        }
+        .expulsion { padding: 8px 12px; background: color-mix(in srgb, #8a3a4a 15%, #1a1724 85%); border-left: 3px solid #8a3a4a; margin-bottom: 6px; font-size: 0.9em; color: #b8b0c8; }
         .msg { text-align: center; color: #8fd18f; margin-bottom: 20px; }
-
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.4em; }
@@ -87,14 +45,9 @@
             <a href="/admin">Admin</a> |
             <a href="/logout">Log out</a>
         </div>
-
         <h1>The Fool's Chamber</h1>
         <p class="subtitle">Only The Fool sees this room.</p>
-
-        {% if message %}
-            <p class="msg">{{ message }}</p>
-        {% endif %}
-
+        {% if message %}<p class="msg">{{ message }}</p>{% endif %}
         <h2>Members</h2>
         {% if members %}
             {% for m in members %}
@@ -104,28 +57,20 @@
                         {% if m.is_fool %}<span class="fool-tag">✦ The Fool</span>{% endif %}
                     </span>
                     {% if not m.is_fool %}
-                        <form method="post" action="/admin/remove" style="margin:0;"
-                              onsubmit="return confirm('Expel {{ m.title }} {{ m.display }}? This cannot be undone.');">
+                        <form method="post" action="/admin/remove" style="margin:0;" onsubmit="return confirm('Expel {{ m.title }} {{ m.display }}? This cannot be undone.');">
                             <input type="hidden" name="codename" value="{{ m.codename }}">
                             <button type="submit" class="remove">Remove</button>
                         </form>
                     {% endif %}
                 </div>
             {% endfor %}
-        {% else %}
-            <p class="empty">No members.</p>
-        {% endif %}
-
+        {% else %}<p class="empty">No members.</p>{% endif %}
         <h2>Record of Expulsions</h2>
         {% if expulsions %}
             {% for e in expulsions %}
-                <div class="expulsion">
-                    <strong>{{ e.codename }}</strong> — expelled by {{ e.expelled_by }} on {{ e.expelled_at }}
-                </div>
+                <div class="expulsion"><strong>{{ e.codename }}</strong> — expelled by {{ e.expelled_by }} on {{ e.expelled_at }}</div>
             {% endfor %}
-        {% else %}
-            <p class="empty">No one has been expelled.</p>
-        {% endif %}
+        {% else %}<p class="empty">No one has been expelled.</p>{% endif %}
     </div>
 </body>
 </html>

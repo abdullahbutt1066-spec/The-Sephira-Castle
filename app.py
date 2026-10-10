@@ -48,17 +48,21 @@ def inject_nav_unread():
 
 
 @app.context_processor
-def inject_user_color():
+def inject_user_theme():
+    """Provide user_color and my_symbol to every template."""
     user = session.get("user")
     if user:
         try:
             members = auth.load_members()
             info = members.get(user)
-            if info and info.get("color"):
-                return {"user_color": info["color"]}
+            if info:
+                return {
+                    "user_color": info.get("color") or "#6a4fa3",
+                    "my_symbol": info.get("symbol") or "✦",
+                }
         except Exception:
             pass
-    return {"user_color": "#6a4fa3"}
+    return {"user_color": "#6a4fa3", "my_symbol": ""}
 
 
 def current_user():
@@ -146,6 +150,7 @@ def register():
         success=success,
         cards=auth.CARDS,
         taken=taken,
+        all_symbols=auth.all_card_symbols(),
     )
 
 
@@ -178,7 +183,7 @@ def login():
 
             message = "You are not worthy, nor are you the chosen one."
 
-    return render_template("login.html", message=message)
+    return render_template("login.html", message=message, all_symbols=auth.all_card_symbols())
 
 
 @app.route("/fool-bind", methods=["GET", "POST"])

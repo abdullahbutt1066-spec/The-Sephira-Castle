@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enter — The Sephira Castle</title>
+    <title>Enter — Sephira Castle</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
     <style>
         :root { --accent: {{ user_color }}; }
@@ -18,8 +18,52 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            overflow: hidden;
         }
+        .wheel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 900px;
+            height: 900px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.06;
+        }
+        .wheel span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 2.5rem;
+            color: #d8d4e0;
+            line-height: 1;
+        }
+        .wheel span:nth-child(1)  { transform: translate(-50%, -50%) rotate(0deg)   translateY(-380px) rotate(0deg); }
+        .wheel span:nth-child(2)  { transform: translate(-50%, -50%) rotate(16.36deg) translateY(-380px) rotate(-16.36deg); }
+        .wheel span:nth-child(3)  { transform: translate(-50%, -50%) rotate(32.73deg) translateY(-380px) rotate(-32.73deg); }
+        .wheel span:nth-child(4)  { transform: translate(-50%, -50%) rotate(49.09deg) translateY(-380px) rotate(-49.09deg); }
+        .wheel span:nth-child(5)  { transform: translate(-50%, -50%) rotate(65.45deg) translateY(-380px) rotate(-65.45deg); }
+        .wheel span:nth-child(6)  { transform: translate(-50%, -50%) rotate(81.82deg) translateY(-380px) rotate(-81.82deg); }
+        .wheel span:nth-child(7)  { transform: translate(-50%, -50%) rotate(98.18deg) translateY(-380px) rotate(-98.18deg); }
+        .wheel span:nth-child(8)  { transform: translate(-50%, -50%) rotate(114.55deg) translateY(-380px) rotate(-114.55deg); }
+        .wheel span:nth-child(9)  { transform: translate(-50%, -50%) rotate(130.91deg) translateY(-380px) rotate(-130.91deg); }
+        .wheel span:nth-child(10) { transform: translate(-50%, -50%) rotate(147.27deg) translateY(-380px) rotate(-147.27deg); }
+        .wheel span:nth-child(11) { transform: translate(-50%, -50%) rotate(163.64deg) translateY(-380px) rotate(-163.64deg); }
+        .wheel span:nth-child(12) { transform: translate(-50%, -50%) rotate(180deg)   translateY(-380px) rotate(-180deg); }
+        .wheel span:nth-child(13) { transform: translate(-50%, -50%) rotate(196.36deg) translateY(-380px) rotate(-196.36deg); }
+        .wheel span:nth-child(14) { transform: translate(-50%, -50%) rotate(212.73deg) translateY(-380px) rotate(-212.73deg); }
+        .wheel span:nth-child(15) { transform: translate(-50%, -50%) rotate(229.09deg) translateY(-380px) rotate(-229.09deg); }
+        .wheel span:nth-child(16) { transform: translate(-50%, -50%) rotate(245.45deg) translateY(-380px) rotate(-245.45deg); }
+        .wheel span:nth-child(17) { transform: translate(-50%, -50%) rotate(261.82deg) translateY(-380px) rotate(-261.82deg); }
+        .wheel span:nth-child(18) { transform: translate(-50%, -50%) rotate(278.18deg) translateY(-380px) rotate(-278.18deg); }
+        .wheel span:nth-child(19) { transform: translate(-50%, -50%) rotate(294.55deg) translateY(-380px) rotate(-294.55deg); }
+        .wheel span:nth-child(20) { transform: translate(-50%, -50%) rotate(310.91deg) translateY(-380px) rotate(-310.91deg); }
+        .wheel span:nth-child(21) { transform: translate(-50%, -50%) rotate(327.27deg) translateY(-380px) rotate(-327.27deg); }
+        .wheel span:nth-child(22) { transform: translate(-50%, -50%) rotate(343.64deg) translateY(-380px) rotate(-343.64deg); }
         .card {
+            position: relative;
+            z-index: 1;
             background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
             padding: 40px 50px;
             border: 1px solid color-mix(in srgb, var(--accent) 20%, #3a3450 80%);
@@ -57,12 +101,16 @@
         a { color: var(--accent); text-decoration: none; }
         @media (max-width: 600px) {
             body { padding: 16px; }
+            .wheel { display: none; }
             .card { padding: 30px 24px; width: 100%; }
             h1 { font-size: 1.3em; }
         }
     </style>
 </head>
 <body>
+    <div class="wheel" aria-hidden="true">
+        {% for sym in all_symbols %}<span>{{ sym }}</span>{% endfor %}
+    </div>
     <div class="card">
         <h1>Enter the Castle</h1>
         {% if message %}<p class="msg">{{ message }}</p>{% endif %}
@@ -78,4 +126,3 @@
     </div>
 </body>
 </html>
-

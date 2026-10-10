@@ -55,28 +55,28 @@ CARD_SYMBOLS = {
 }
 
 CARD_COLORS = {
-    "The Fool": "#c4a8ff",
-    "The Magician": "#7db8e8",
-    "The High Priestess": "#b0a8e0",
-    "The Empress": "#e8b0c4",
-    "The Emperor": "#e0c48a",
-    "The Hierophant": "#d4a0d4",
-    "The Lovers": "#f0a0b0",
-    "The Chariot": "#90a8e0",
-    "Strength": "#e0a870",
-    "The Hermit": "#8a9ab0",
-    "Wheel of Fortune": "#b8c878",
-    "Justice": "#c8d8e8",
-    "The Hanged Man": "#88b0a0",
-    "Death": "#706070",
-    "Temperance": "#a0d8c8",
-    "The Devil": "#a86088",
-    "The Tower": "#c87878",
-    "The Star": "#e8e878",
-    "The Moon": "#88a8d0",
-    "The Sun": "#f0b850",
-    "Judgement": "#d0a0c8",
-    "The World": "#88c8a0",
+    "The Fool": "#f0d850",
+    "The Magician": "#e84848",
+    "The High Priestess": "#5a70c8",
+    "The Empress": "#6bb56b",
+    "The Emperor": "#e0663a",
+    "The Hierophant": "#b8b8b8",
+    "The Lovers": "#a878d8",
+    "The Chariot": "#6090d8",
+    "Strength": "#e8c850",
+    "The Hermit": "#8a8a95",
+    "Wheel of Fortune": "#d8a838",
+    "Justice": "#c8a04a",
+    "The Hanged Man": "#5a7ab0",
+    "Death": "#7a7a85",
+    "Temperance": "#d8d4c8",
+    "The Devil": "#a82838",
+    "The Tower": "#c87848",
+    "The Star": "#78b8e8",
+    "The Moon": "#6a80b8",
+    "The Sun": "#f0c040",
+    "Judgement": "#8898b8",
+    "The World": "#7ac8a0",
 }
 
 IP_LIMIT = 3
@@ -251,3 +251,8 @@ def get_card_decorations(codename):
     symbol = CARD_SYMBOLS.get(codename, "·")
     color = CARD_COLORS.get(codename, "#b8b0c8")
     return symbol, color
+
+
+def all_card_symbols():
+    """Return list of all card symbols in order (for the Wheel)."""
+    return [CARD_SYMBOLS[c] for c in CARDS]

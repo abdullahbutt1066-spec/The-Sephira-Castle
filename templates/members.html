@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Gathering — The Sephira Castle</title>
+    <title>The Gathering — Sephira Castle</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
     <style>
         :root { --accent: {{ user_color }}; }
@@ -16,11 +16,37 @@
             padding: 80px 20px;
             margin: 0;
             min-height: 100vh;
+            overflow-x: hidden;
         }
+        .bg-symbol {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 42rem;
+            color: var(--accent);
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 0;
+            user-select: none;
+            line-height: 1;
+        }
+        .topnav, h1, .welcome, ul { position: relative; z-index: 1; }
         h1 { font-size: 2em; margin-bottom: 0.3em; }
         .welcome { font-size: 1.1em; margin-bottom: 40px; color: var(--accent); }
         ul { list-style: none; padding: 0; max-width: 400px; margin: 0 auto; }
-        li { margin: 10px 0; padding: 12px 18px; background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 6px; display: flex; align-items: center; gap: 12px; font-size: 1.05em; text-align: left; }
+        li {
+            margin: 10px 0;
+            padding: 12px 18px;
+            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
+            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05em;
+            text-align: left;
+        }
         li .symbol { font-size: 1.4em; line-height: 1; flex-shrink: 0; }
         li .name { font-weight: bold; }
         li .fool-star { margin-left: auto; color: var(--accent); font-size: 0.85em; }
@@ -35,10 +61,12 @@
             .topnav a { margin: 0 4px; }
             ul { max-width: 100%; }
             li { padding: 10px 14px; font-size: 0.95em; }
+            .bg-symbol { font-size: 20rem; opacity: 0.04; }
         }
     </style>
 </head>
 <body>
+    <div class="bg-symbol" aria-hidden="true">{{ my_symbol }}</div>
     <div class="topnav">
         <a href="/members">Members</a> |
         <a href="/chat">The Gathering</a> |
@@ -59,4 +87,3 @@
     </ul>
 </body>
 </html>
-

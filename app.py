@@ -11,14 +11,11 @@ init_db()
 
 
 def relative_time(timestamp_str):
-    """Convert '2026-10-07 15:30' into 'just now', '5 min ago', etc."""
     try:
         then = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M")
     except (ValueError, TypeError):
         return timestamp_str
-
     seconds = (datetime.now() - then).total_seconds()
-
     if seconds < 0:
         return timestamp_str
     elif seconds < 60:
@@ -49,7 +46,6 @@ def inject_nav_unread():
 
 @app.context_processor
 def inject_user_theme():
-    """Provide user_color and my_symbol to every template."""
     user = session.get("user")
     if user:
         try:
@@ -79,6 +75,11 @@ def client_ip():
 @app.route("/")
 def home():
     return render_template("home.html")
+
+
+@app.route("/rules")
+def rules():
+    return render_template("rules.html")
 
 
 @app.route("/register", methods=["GET", "POST"])

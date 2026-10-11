@@ -58,6 +58,14 @@
             width: 340px; max-width: 100%;
         }
         h1 { text-align: center; font-size: 1.5em; margin-top: 0; }
+        .rules-note {
+            text-align: center;
+            font-size: 0.82em;
+            color: #9a93a8;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .rules-note a { color: var(--accent); text-decoration: none; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
         input, select {
             width: 100%; padding: 10px;
@@ -98,6 +106,7 @@
     </div>
     <div class="card">
         <h1>Enter Sephira Castle</h1>
+        <p class="rules-note">Before choosing your card, <a href="/rules">read the Rules</a>.</p>
         {% if message %}<p class="msg {{ 'ok' if success else 'err' }}">{{ message }}</p>{% endif %}
         <form method="post">
             <label for="codename">Codename</label>

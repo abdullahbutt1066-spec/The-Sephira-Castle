@@ -94,8 +94,10 @@
             font-size: 1em;
             cursor: pointer;
             font-family: inherit;
+            transition: opacity 0.15s;
         }
-        button:hover { filter: brightness(1.2); }
+        button:hover:not(:disabled) { filter: brightness(1.2); }
+        button:disabled { opacity: 0.6; cursor: wait; }
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; color: #d18f8f; }
         .link { text-align: center; margin-top: 20px; font-size: 0.85em; }
         a { color: var(--accent); text-decoration: none; }
@@ -124,5 +126,21 @@
         <p class="link">Not a member? <a href="/register">Register</a></p>
         <p class="link">Forgot your recovery password? <a href="/fool-recover">Recover</a></p>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    const os = form.getAttribute('onsubmit') || '';
+                    if (os.includes('confirm')) return;
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn && !btn.disabled) {
+                        btn.disabled = true;
+                        btn.dataset.original = btn.textContent;
+                        btn.textContent = 'Working...';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

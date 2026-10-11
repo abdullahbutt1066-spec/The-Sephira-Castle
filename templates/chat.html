@@ -10,17 +10,11 @@
         * { box-sizing: border-box; }
         body { font-family: Georgia, serif; background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%); color: #d8d4e0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         .bg-symbol {
-            position: fixed;
-            top: 50%;
-            left: 50%;
+            position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 42rem;
-            color: var(--accent);
-            opacity: 0.05;
-            pointer-events: none;
-            z-index: 0;
-            user-select: none;
-            line-height: 1;
+            font-size: 42rem; color: var(--accent);
+            opacity: 0.05; pointer-events: none;
+            z-index: 0; user-select: none; line-height: 1;
         }
         .container { width: 100%; max-width: 720px; position: relative; z-index: 1; }
         h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
@@ -44,8 +38,9 @@
         form.new-message { display: flex; gap: 10px; }
         input[type="text"] { flex: 1; padding: 12px; background: #1a1724; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 6px; font-family: inherit; font-size: 1em; min-width: 0; }
         input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-        button.send { padding: 12px 24px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0; }
-        button.send:hover { filter: brightness(1.2); }
+        button.send { padding: 12px 24px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0; transition: opacity 0.15s; }
+        button.send:hover:not(:disabled) { filter: brightness(1.2); }
+        button.send:disabled { opacity: 0.6; cursor: wait; }
         .topnav { text-align: center; margin-bottom: 24px; font-size: 0.9em; line-height: 1.8; }
         .topnav a { color: var(--accent); text-decoration: none; margin: 0 6px; }
         .topnav a:hover { filter: brightness(1.3); }
@@ -107,6 +102,20 @@
         </form>
     </div>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    const os = form.getAttribute('onsubmit') || '';
+                    if (os.includes('confirm')) return;
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn && !btn.disabled) {
+                        btn.disabled = true;
+                        btn.textContent = 'Sending...';
+                    }
+                });
+            });
+        });
+
         let isTyping = false;
         const input = document.querySelector('input[name="text"]');
         if (input) {

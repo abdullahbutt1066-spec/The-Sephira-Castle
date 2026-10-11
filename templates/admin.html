@@ -10,17 +10,11 @@
         * { box-sizing: border-box; }
         body { font-family: Georgia, serif; background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%); color: #d8d4e0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         .bg-symbol {
-            position: fixed;
-            top: 50%;
-            left: 50%;
+            position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 42rem;
-            color: var(--accent);
-            opacity: 0.05;
-            pointer-events: none;
-            z-index: 0;
-            user-select: none;
-            line-height: 1;
+            font-size: 42rem; color: var(--accent);
+            opacity: 0.05; pointer-events: none;
+            z-index: 0; user-select: none; line-height: 1;
         }
         .container { width: 100%; max-width: 720px; position: relative; z-index: 1; }
         h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
@@ -32,8 +26,9 @@
         .member-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 6px; margin-bottom: 8px; gap: 10px; }
         .member-name { color: #d8d4e0; flex: 1; }
         .fool-tag { color: var(--accent); font-size: 0.85em; margin-left: 8px; }
-        button.remove { background: #5a2a3a; color: #f0c8c8; border: 1px solid #8a3a4a; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.85em; flex-shrink: 0; }
-        button.remove:hover { background: #7a3a4a; }
+        button.remove { background: #5a2a3a; color: #f0c8c8; border: 1px solid #8a3a4a; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.85em; flex-shrink: 0; transition: opacity 0.15s; }
+        button.remove:hover:not(:disabled) { background: #7a3a4a; }
+        button.remove:disabled { opacity: 0.6; cursor: wait; }
         .empty { color: #6a6380; font-style: italic; text-align: center; padding: 12px; }
         .expulsion { padding: 8px 12px; background: color-mix(in srgb, #8a3a4a 15%, #1a1724 85%); border-left: 3px solid #8a3a4a; margin-bottom: 6px; font-size: 0.9em; color: #b8b0c8; }
         .msg { text-align: center; color: #8fd18f; margin-bottom: 20px; }
@@ -87,5 +82,20 @@
             {% endfor %}
         {% else %}<p class="empty">No one has been expelled.</p>{% endif %}
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    const os = form.getAttribute('onsubmit') || '';
+                    if (os.includes('confirm')) return;
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn && !btn.disabled) {
+                        btn.disabled = true;
+                        btn.textContent = 'Working...';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

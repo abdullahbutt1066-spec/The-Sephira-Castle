@@ -31,8 +31,15 @@
         p { color: #b8b0c8; font-size: 0.9em; text-align: center; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
         input { width: 100%; padding: 10px; background: #14121a; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 4px; font-family: inherit; font-size: 1em; }
-        button { width: 100%; margin-top: 22px; padding: 12px; background: var(--accent); border: none; color: #fff; border-radius: 4px; font-size: 1em; cursor: pointer; font-family: inherit; }
-        button:hover { filter: brightness(1.2); }
+        button {
+            width: 100%; margin-top: 22px; padding: 12px;
+            background: var(--accent); border: none; color: #fff;
+            border-radius: 4px; font-size: 1em; cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.15s;
+        }
+        button:hover:not(:disabled) { filter: brightness(1.2); }
+        button:disabled { opacity: 0.6; cursor: wait; }
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; color: #d18f8f; }
         @media (max-width: 600px) {
             body { padding: 16px; }
@@ -52,5 +59,20 @@
             <button type="submit">Bind This Device</button>
         </form>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    const os = form.getAttribute('onsubmit') || '';
+                    if (os.includes('confirm')) return;
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn && !btn.disabled) {
+                        btn.disabled = true;
+                        btn.textContent = 'Working...';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

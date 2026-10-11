@@ -43,8 +43,9 @@
         form.new-message { display: flex; gap: 10px; }
         input[type="text"] { flex: 1; padding: 12px; background: #1a1724; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 6px; font-family: inherit; font-size: 1em; min-width: 0; }
         input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-        button.send { padding: 12px 24px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0; }
-        button.send:hover { filter: brightness(1.2); }
+        button.send { padding: 12px 24px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0; transition: opacity 0.15s; }
+        button.send:hover:not(:disabled) { filter: brightness(1.2); }
+        button.send:disabled { opacity: 0.6; cursor: wait; }
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.3em; }
@@ -102,6 +103,20 @@
         </form>
     </div>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    const os = form.getAttribute('onsubmit') || '';
+                    if (os.includes('confirm')) return;
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn && !btn.disabled) {
+                        btn.disabled = true;
+                        btn.textContent = 'Sending...';
+                    }
+                });
+            });
+        });
+
         let isTyping = false;
         const input = document.querySelector('input[name="text"]');
         if (input) {

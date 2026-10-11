@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Gathering — Sephira Castle</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0f0d14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sephira">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
@@ -18,10 +24,24 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 40%,
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
+                    transparent 60%),
+                radial-gradient(ellipse at center,
+                    transparent 0%,
+                    rgba(10, 8, 18, 0.5) 60%,
+                    rgba(3, 2, 8, 0.9) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
         .bg-symbol {
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             font-size: 42rem;
             color: var(--accent);
@@ -35,18 +55,7 @@
         h1 { font-size: 2em; margin-bottom: 0.3em; }
         .welcome { font-size: 1.1em; margin-bottom: 40px; color: var(--accent); }
         ul { list-style: none; padding: 0; max-width: 400px; margin: 0 auto; }
-        li {
-            margin: 10px 0;
-            padding: 12px 18px;
-            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
-            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.05em;
-            text-align: left;
-        }
+        li { margin: 10px 0; padding: 12px 18px; background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 6px; display: flex; align-items: center; gap: 12px; font-size: 1.05em; text-align: left; }
         li .symbol { font-size: 1.4em; line-height: 1; flex-shrink: 0; }
         li .name { font-weight: bold; }
         li .fool-star { margin-left: auto; color: var(--accent); font-size: 0.85em; }
@@ -66,6 +75,13 @@
     </style>
 </head>
 <body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
     <div class="bg-symbol" aria-hidden="true">{{ my_symbol }}</div>
     <div class="topnav">
         <a href="/members">Members</a> |

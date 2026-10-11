@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Rules — Sephira Castle</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0f0d14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sephira">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
@@ -17,84 +23,35 @@
             min-height: 100vh;
             margin: 0;
             padding: 40px 20px;
-            overflow-x: hidden;
         }
-        .container {
-            width: 100%;
-            max-width: 640px;
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 40%,
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
+                    transparent 60%),
+                radial-gradient(ellipse at center,
+                    transparent 0%,
+                    rgba(10, 8, 18, 0.5) 60%,
+                    rgba(3, 2, 8, 0.9) 100%);
+            pointer-events: none;
+            z-index: 0;
         }
-        h1 {
-            text-align: center;
-            font-size: 1.8em;
-            color: var(--accent);
-            margin-bottom: 0.2em;
-        }
-        .subtitle {
-            text-align: center;
-            color: #8a7fb0;
-            font-style: italic;
-            font-size: 0.95em;
-            margin-bottom: 40px;
-        }
-        h2 {
-            font-size: 1.05em;
-            color: var(--accent);
-            margin-top: 32px;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-        p {
-            color: #c8c0d8;
-            line-height: 1.6;
-            margin: 0 0 8px;
-        }
-        .rule {
-            background: color-mix(in srgb, var(--accent) 6%, #1a1724 94%);
-            border: 1px solid color-mix(in srgb, var(--accent) 12%, #2a2536 88%);
-            border-left: 3px solid var(--accent);
-            border-radius: 6px;
-            padding: 16px 20px;
-            margin-bottom: 16px;
-        }
-        .rule h2 {
-            margin-top: 0;
-            font-size: 0.95em;
-            text-transform: uppercase;
-        }
-        .closing {
-            text-align: center;
-            color: var(--accent);
-            font-style: italic;
-            margin: 40px 0 20px;
-            font-size: 1em;
-        }
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 30px;
-        }
-        .actions a {
-            display: inline-block;
-            padding: 12px 28px;
-            font-size: 1em;
-            text-decoration: none;
-            color: #fff;
-            background: var(--accent);
-            border: 2px solid var(--accent);
-            border-radius: 6px;
-            transition: filter 0.15s;
-        }
+        .container { width: 100%; max-width: 640px; position: relative; z-index: 1; }
+        h1 { text-align: center; font-size: 1.8em; color: var(--accent); margin-bottom: 0.2em; }
+        .subtitle { text-align: center; color: #8a7fb0; font-style: italic; font-size: 0.95em; margin-bottom: 40px; }
+        h2 { font-size: 1.05em; color: var(--accent); margin-top: 32px; margin-bottom: 8px; letter-spacing: 1px; }
+        p { color: #c8c0d8; line-height: 1.6; margin: 0 0 8px; }
+        .rule { background: color-mix(in srgb, var(--accent) 6%, #1a1724 94%); border: 1px solid color-mix(in srgb, var(--accent) 12%, #2a2536 88%); border-left: 3px solid var(--accent); border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; }
+        .rule h2 { margin-top: 0; font-size: 0.95em; text-transform: uppercase; }
+        .closing { text-align: center; color: var(--accent); font-style: italic; margin: 40px 0 20px; font-size: 1em; }
+        .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
+        .actions a { display: inline-block; padding: 12px 28px; font-size: 1em; text-decoration: none; color: #fff; background: var(--accent); border: 2px solid var(--accent); border-radius: 6px; transition: filter 0.15s; }
         .actions a:hover { filter: brightness(1.2); }
-        .actions a.secondary {
-            background: transparent;
-            color: var(--accent);
-        }
-        .actions a.secondary:hover {
-            background: color-mix(in srgb, var(--accent) 15%, transparent 85%);
-            color: #fff;
-        }
+        .actions a.secondary { background: transparent; color: var(--accent); }
+        .actions a.secondary:hover { background: color-mix(in srgb, var(--accent) 15%, transparent 85%); color: #fff; }
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.5em; }
@@ -108,6 +65,13 @@
     </style>
 </head>
 <body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
     <div class="container">
         <h1>The Sephira Castle</h1>
         <p class="subtitle">These words were set down when the first card was drawn.</p>
@@ -116,39 +80,32 @@
             <h2>First — Of Entry</h2>
             <p>The Castle admits only those who choose a card. There are twenty-two seats, and no more. Once a seat is taken, it is bound.</p>
         </div>
-
         <div class="rule">
             <h2>Second — Of Names</h2>
             <p>Your codename is your card. It is your face here. It cannot be changed once chosen.</p>
         </div>
-
         <div class="rule">
             <h2>Third — Of Speech</h2>
             <p>Speak freely in the Gathering. Your words carry your color and your sigil, and every member will know you by them.</p>
         </div>
-
         <div class="rule">
             <h2>Fourth — Of Private Audience</h2>
             <p>Some words are not for the Gathering. If you wish to speak privately with another member, you must ask the Fool. He alone opens the doors of private chambers.</p>
         </div>
-
         <div class="rule">
             <h2>Fifth — Of The Fool</h2>
             <p>The Fool is one seat, held by one person. He is not above the rules — he is their keeper.</p>
         </div>
-
         <div class="rule">
             <h2>Sixth — Of Silence</h2>
             <p>What is spoken in a private chamber remains there. To break this silence is to break the Club.</p>
         </div>
-
         <div class="rule">
             <h2>Seventh — Of Expulsion</h2>
             <p>The Fool may strike a name from the record. Such a name is not spoken again, and the one who held it may not return.</p>
         </div>
 
         <p class="closing">The Wheel turns. Choose your card.</p>
-
         <div class="actions">
             <a href="/register">Choose a Card</a>
             <a href="/" class="secondary">Return Home</a>

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enter — Sephira Castle</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0f0d14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sephira">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
@@ -20,25 +26,28 @@
             padding: 20px;
             overflow: hidden;
         }
-        .wheel {
+        body::before {
+            content: '';
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 900px;
-            height: 900px;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 40%,
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
+                    transparent 60%),
+                radial-gradient(ellipse at center,
+                    transparent 0%,
+                    rgba(10, 8, 18, 0.5) 60%,
+                    rgba(3, 2, 8, 0.9) 100%);
             pointer-events: none;
             z-index: 0;
-            opacity: 0.06;
         }
-        .wheel span {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            font-size: 2.5rem;
-            color: #d8d4e0;
-            line-height: 1;
+        .wheel {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 900px; height: 900px;
+            pointer-events: none; z-index: 0; opacity: 0.06;
         }
+        .wheel span { position: absolute; top: 50%; left: 50%; font-size: 2.5rem; color: #d8d4e0; line-height: 1; }
         .wheel span:nth-child(1)  { transform: translate(-50%, -50%) rotate(0deg)   translateY(-380px) rotate(0deg); }
         .wheel span:nth-child(2)  { transform: translate(-50%, -50%) rotate(16.36deg) translateY(-380px) rotate(-16.36deg); }
         .wheel span:nth-child(3)  { transform: translate(-50%, -50%) rotate(32.73deg) translateY(-380px) rotate(-32.73deg); }
@@ -73,29 +82,8 @@
         }
         h1 { text-align: center; font-size: 1.5em; margin-top: 0; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
-        input {
-            width: 100%;
-            padding: 10px;
-            background: #14121a;
-            border: 1px solid #3a3450;
-            color: #d8d4e0;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 1em;
-        }
-        button {
-            width: 100%;
-            margin-top: 22px;
-            padding: 12px;
-            background: var(--accent);
-            border: none;
-            color: #fff;
-            border-radius: 4px;
-            font-size: 1em;
-            cursor: pointer;
-            font-family: inherit;
-            transition: opacity 0.15s;
-        }
+        input { width: 100%; padding: 10px; background: #14121a; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 4px; font-family: inherit; font-size: 1em; }
+        button { width: 100%; margin-top: 22px; padding: 12px; background: var(--accent); border: none; color: #fff; border-radius: 4px; font-size: 1em; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
         button:hover:not(:disabled) { filter: brightness(1.2); }
         button:disabled { opacity: 0.6; cursor: wait; }
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; color: #d18f8f; }
@@ -110,6 +98,13 @@
     </style>
 </head>
 <body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
     <div class="wheel" aria-hidden="true">
         {% for sym in all_symbols %}<span>{{ sym }}</span>{% endfor %}
     </div>
@@ -125,6 +120,7 @@
         </form>
         <p class="link">Not a member? <a href="/register">Register</a></p>
         <p class="link">Forgot your recovery password? <a href="/fool-recover">Recover</a></p>
+        <p class="link"><a href="/rules">Read the Rules</a></p>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -135,7 +131,6 @@
                     const btn = form.querySelector('button[type="submit"]');
                     if (btn && !btn.disabled) {
                         btn.disabled = true;
-                        btn.dataset.original = btn.textContent;
                         btn.textContent = 'Working...';
                     }
                 });

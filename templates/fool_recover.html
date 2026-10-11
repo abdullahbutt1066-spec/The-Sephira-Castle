@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recover — Sephira Castle</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0f0d14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sephira">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
@@ -19,7 +25,24 @@
             margin: 0;
             padding: 20px;
         }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 40%,
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
+                    transparent 60%),
+                radial-gradient(ellipse at center,
+                    transparent 0%,
+                    rgba(10, 8, 18, 0.5) 60%,
+                    rgba(3, 2, 8, 0.9) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
         .card {
+            position: relative;
+            z-index: 1;
             background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
             padding: 40px 50px;
             border: 1px solid color-mix(in srgb, var(--accent) 20%, #3a3450 80%);
@@ -31,13 +54,7 @@
         p { color: #b8b0c8; font-size: 0.9em; text-align: center; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
         input { width: 100%; padding: 10px; background: #14121a; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 4px; font-family: inherit; font-size: 1em; }
-        button {
-            width: 100%; margin-top: 22px; padding: 12px;
-            background: var(--accent); border: none; color: #fff;
-            border-radius: 4px; font-size: 1em; cursor: pointer;
-            font-family: inherit;
-            transition: opacity 0.15s;
-        }
+        button { width: 100%; margin-top: 22px; padding: 12px; background: var(--accent); border: none; color: #fff; border-radius: 4px; font-size: 1em; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
         button:hover:not(:disabled) { filter: brightness(1.2); }
         button:disabled { opacity: 0.6; cursor: wait; }
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; }
@@ -53,6 +70,13 @@
     </style>
 </head>
 <body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
     <div class="card">
         <h1>Recover The Fool's Recovery Password</h1>
         <p>Enter your pre-registered email to receive a one-time code.</p>

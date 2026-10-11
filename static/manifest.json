@@ -1,0 +1,19 @@
+﻿{
+    "name": "The Sephira Castle",
+    "short_name": "Sephira",
+    "description": "A secret Tarot Club. Choose a card, take a seat, and speak with the others in the gathering.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0f0d14",
+    "theme_color": "#0f0d14",
+    "icons": [
+        {
+            "src": "/static/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

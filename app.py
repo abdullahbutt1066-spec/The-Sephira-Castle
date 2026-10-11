@@ -1,6 +1,6 @@
 ﻿import os
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, session, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, make_response, send_from_directory
 import auth
 import messages as msg_store
 from db import init_db
@@ -80,6 +80,11 @@ def home():
 @app.route("/rules")
 def rules():
     return render_template("rules.html")
+
+
+@app.route("/sw.js")
+def service_worker():
+    return send_from_directory("static", "sw.js", mimetype="application/javascript")
 
 
 @app.route("/register", methods=["GET", "POST"])

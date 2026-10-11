@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sephira Castle</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23c4a8ff%22>✦</text></svg>">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0f0d14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sephira">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
         :root { --accent: {{ user_color }}; }
         * { box-sizing: border-box; }
@@ -17,6 +23,22 @@
             margin: 0;
             min-height: 100vh;
         }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 40%,
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
+                    transparent 60%),
+                radial-gradient(ellipse at center,
+                    transparent 0%,
+                    rgba(10, 8, 18, 0.5) 60%,
+                    rgba(3, 2, 8, 0.9) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        main, nav { position: relative; z-index: 1; }
         h1 { font-size: 2.5em; margin-bottom: 0.2em; }
         p { color: #b8b0c8; font-size: 1.05em; }
         nav { margin-top: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
@@ -45,6 +67,13 @@
     </style>
 </head>
 <body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
     <main>
         <h1>Welcome to The Sephira Castle</h1>
         <p>The gathering is not yet in session.</p>

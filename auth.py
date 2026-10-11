@@ -55,20 +55,20 @@ CARD_SYMBOLS = {
 }
 
 CARD_COLORS = {
-    "The Fool": "#f0d850",
+    "The Fool": "#7e83d6",
     "The Magician": "#e84848",
     "The High Priestess": "#5a70c8",
-    "The Empress": "#6bb56b",
-    "The Emperor": "#e0663a",
+    "The Empress": "#cc3f83",
+    "The Emperor": "#fff200",
     "The Hierophant": "#b8b8b8",
     "The Lovers": "#a878d8",
     "The Chariot": "#6090d8",
-    "Strength": "#e8c850",
+    "Strength": "#a8a8a8",
     "The Hermit": "#8a8a95",
-    "Wheel of Fortune": "#d8a838",
+    "Wheel of Fortune": "#42dbc9",
     "Justice": "#c8a04a",
     "The Hanged Man": "#5a7ab0",
-    "Death": "#7a7a85",
+    "Death": "#3e4141",
     "Temperance": "#d8d4c8",
     "The Devil": "#a82838",
     "The Tower": "#c87848",
@@ -76,7 +76,7 @@ CARD_COLORS = {
     "The Moon": "#6a80b8",
     "The Sun": "#f0c040",
     "Judgement": "#8898b8",
-    "The World": "#7ac8a0",
+    "The World": "#662121",
 }
 
 IP_LIMIT = 3
@@ -254,5 +254,4 @@ def get_card_decorations(codename):
 
 
 def all_card_symbols():
-    """Return list of all card symbols in order (for the Wheel)."""
     return [CARD_SYMBOLS[c] for c in CARDS]

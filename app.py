@@ -33,6 +33,20 @@ def relative_time(timestamp_str):
 app.jinja_env.filters["reltime"] = relative_time
 
 
+@app.before_request
+def update_last_seen():
+    """Touch the logged-in user's last_seen on every request, except static assets."""
+    # Skip static files and the service worker to avoid unnecessary DB writes
+    if request.path.startswith("/static/") or request.path == "/sw.js" or request.path == "/favicon.ico":
+        return
+    user = session.get("user")
+    if user:
+        try:
+            auth.touch_last_seen(user)
+        except Exception:
+            pass
+
+
 @app.context_processor
 def inject_nav_unread():
     user = session.get("user")
@@ -126,6 +140,7 @@ def register():
         else:
             salt = auth.make_salt()
             symbol, color = auth.get_card_decorations(codename)
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             entry = {
                 "salt": salt,
                 "password": auth.hash_password(password, salt),
@@ -137,6 +152,7 @@ def register():
                 "symbol": symbol,
                 "color": color,
                 "email": None,
+                "last_seen": now,
             }
             if is_fool_registration:
                 rec_salt = auth.make_salt()
@@ -310,13 +326,19 @@ def members():
 
     listing = []
     for name, m in all_members.items():
+        last_seen = m.get("last_seen")
         listing.append({
             "title": auth.title_for(m["gender"]),
             "display": auth.display_name(name),
             "symbol": m.get("symbol") or "·",
             "color": m.get("color") or "#b8b0c8",
             "is_fool": m.get("is_fool", False),
+            "online": auth.is_online(last_seen),
+            "status": auth.status_text(last_seen),
         })
+
+    # Sort: online first, then by last_seen desc, then alphabetical
+    listing.sort(key=lambda m: (not m["online"], m["display"]))
 
     return render_template(
         "members.html",

@@ -81,6 +81,7 @@ CARD_COLORS = {
 
 IP_LIMIT = 3
 DEVICE_LIMIT = 2
+ONLINE_WINDOW_MINUTES = 5
 
 
 def load_members():
@@ -90,12 +91,12 @@ def load_members():
             cur.execute("""
                 SELECT codename, salt, password, gender,
                        is_fool, recovery_hash, device_tokens, ip,
-                       symbol, color, email
+                       symbol, color, email, last_seen
                 FROM members
             """)
             for row in cur.fetchall():
                 (codename, salt, password, gender, is_fool, recovery_hash,
-                 device_tokens, ip, symbol, color, email) = row
+                 device_tokens, ip, symbol, color, email, last_seen) = row
                 try:
                     tokens = json.loads(device_tokens) if device_tokens else []
                 except (json.JSONDecodeError, TypeError):
@@ -111,6 +112,7 @@ def load_members():
                     "symbol": symbol,
                     "color": color,
                     "email": email,
+                    "last_seen": last_seen,
                 }
     return members
 
@@ -122,8 +124,8 @@ def save_members(members):
                 cur.execute("""
                     INSERT INTO members
                         (codename, salt, password, gender, is_fool, recovery_hash,
-                         device_tokens, ip, symbol, color, email)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                         device_tokens, ip, symbol, color, email, last_seen)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (codename) DO UPDATE SET
                         salt = EXCLUDED.salt,
                         password = EXCLUDED.password,
@@ -134,7 +136,8 @@ def save_members(members):
                         ip = EXCLUDED.ip,
                         symbol = EXCLUDED.symbol,
                         color = EXCLUDED.color,
-                        email = EXCLUDED.email
+                        email = EXCLUDED.email,
+                        last_seen = EXCLUDED.last_seen
                 """, (
                     codename,
                     info["salt"],
@@ -147,8 +150,54 @@ def save_members(members):
                     info.get("symbol"),
                     info.get("color"),
                     info.get("email"),
+                    info.get("last_seen"),
                 ))
         conn.commit()
+
+
+def touch_last_seen(codename):
+    """Update this member's last_seen to the current time. Fast, single UPDATE."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE members SET last_seen = %s WHERE codename = %s", (now, codename))
+        conn.commit()
+
+
+def is_online(last_seen_str):
+    """Return True if last_seen is within the online window."""
+    if not last_seen_str:
+        return False
+    try:
+        last = datetime.strptime(last_seen_str, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return False
+    diff_seconds = (datetime.now() - last).total_seconds()
+    return diff_seconds < (ONLINE_WINDOW_MINUTES * 60)
+
+
+def status_text(last_seen_str):
+    """Return a human-readable status: 'Online now' or 'Last seen 5 min ago'."""
+    if not last_seen_str:
+        return "Never"
+    try:
+        last = datetime.strptime(last_seen_str, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return "Never"
+
+    seconds = (datetime.now() - last).total_seconds()
+    if seconds < 0:
+        return "Online now"
+    elif seconds < ONLINE_WINDOW_MINUTES * 60:
+        return "Online now"
+    elif seconds < 3600:
+        return f"Last seen {int(seconds // 60)} min ago"
+    elif seconds < 86400:
+        return f"Last seen {int(seconds // 3600)} h ago"
+    elif seconds < 604800:
+        return f"Last seen {int(seconds // 86400)} d ago"
+    else:
+        return f"Last seen {last.strftime('%b %d')}"
 
 
 def count_registrations_from_ip(ip):

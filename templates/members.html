@@ -26,8 +26,7 @@
         }
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
                     color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
@@ -36,29 +35,54 @@
                     transparent 0%,
                     rgba(10, 8, 18, 0.5) 60%,
                     rgba(3, 2, 8, 0.9) 100%);
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
         .bg-symbol {
-            position: fixed;
-            top: 50%; left: 50%;
+            position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 42rem;
-            color: var(--accent);
-            opacity: 0.05;
-            pointer-events: none;
-            z-index: 0;
-            user-select: none;
-            line-height: 1;
+            font-size: 42rem; color: var(--accent);
+            opacity: 0.05; pointer-events: none;
+            z-index: 0; user-select: none; line-height: 1;
         }
         .topnav, h1, .welcome, ul { position: relative; z-index: 1; }
         h1 { font-size: 2em; margin-bottom: 0.3em; }
         .welcome { font-size: 1.1em; margin-bottom: 40px; color: var(--accent); }
-        ul { list-style: none; padding: 0; max-width: 400px; margin: 0 auto; }
-        li { margin: 10px 0; padding: 12px 18px; background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 6px; display: flex; align-items: center; gap: 12px; font-size: 1.05em; text-align: left; }
+        ul { list-style: none; padding: 0; max-width: 460px; margin: 0 auto; }
+        li {
+            margin: 10px 0;
+            padding: 12px 18px;
+            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
+            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05em;
+            text-align: left;
+        }
         li .symbol { font-size: 1.4em; line-height: 1; flex-shrink: 0; }
         li .name { font-weight: bold; }
-        li .fool-star { margin-left: auto; color: var(--accent); font-size: 0.85em; }
+        li .status {
+            margin-left: auto;
+            font-size: 0.8em;
+            color: #8a7fb0;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        li .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #5a5560;
+            flex-shrink: 0;
+        }
+        li .dot.online {
+            background: #42c878;
+            box-shadow: 0 0 6px #42c878;
+        }
+        li .fool-star { color: var(--accent); font-size: 0.85em; }
         .topnav { margin-bottom: 30px; font-size: 0.9em; line-height: 1.8; }
         .topnav a { color: var(--accent); text-decoration: none; margin: 0 6px; }
         .topnav a:hover { filter: brightness(1.3); }
@@ -69,7 +93,8 @@
             .topnav { font-size: 0.85em; }
             .topnav a { margin: 0 4px; }
             ul { max-width: 100%; }
-            li { padding: 10px 14px; font-size: 0.95em; }
+            li { padding: 10px 14px; font-size: 0.95em; flex-wrap: wrap; }
+            li .status { font-size: 0.75em; }
             .bg-symbol { font-size: 20rem; opacity: 0.04; }
         }
     </style>
@@ -98,10 +123,12 @@
             <span class="symbol" style="color: {{ m.color }};">{{ m.symbol }}</span>
             <span class="name" style="color: {{ m.color }};">{{ m.title }} {{ m.display }}</span>
             {% if m.is_fool %}<span class="fool-star">✦</span>{% endif %}
+            <span class="status">
+                <span class="dot {% if m.online %}online{% endif %}"></span>
+                {{ m.status }}
+            </span>
         </li>
     {% endfor %}
     </ul>
 </body>
 </html>
-
-

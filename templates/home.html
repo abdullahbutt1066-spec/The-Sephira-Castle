@@ -124,23 +124,35 @@
             font-family: inherit;
             text-decoration: none;
             color: #fff;
-            background: var(--accent);
-            border: 2px solid var(--accent);
-            border-radius: 6px;
-            transition: filter 0.2s, transform 0.2s;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
+                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
+            border-radius: 14px;
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+            transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
         }
         nav a:hover, nav a:focus {
-            filter: brightness(1.2);
+            filter: brightness(1.15);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 50%, transparent 50%);
             outline: 3px solid var(--accent);
             outline-offset: 3px;
         }
         nav a.secondary {
-            background: transparent;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 12%, rgba(20, 18, 30, 0.5)) 0%,
+                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.7)) 100%);
             color: var(--accent);
+            border-color: color-mix(in srgb, var(--accent) 35%, transparent 65%);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         nav a.secondary:hover, nav a.secondary:focus {
-            background: color-mix(in srgb, var(--accent) 15%, transparent 85%);
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 22%, rgba(20, 18, 30, 0.5)) 0%,
+                color-mix(in srgb, var(--accent) 12%, rgba(10, 8, 18, 0.7)) 100%);
             color: #fff;
         }
         @keyframes fadeDown {
@@ -184,17 +196,13 @@
     </div>
     <main>
         <h1>The Sephira Castle</h1>
-
         <p class="invitation">
             Twenty-two seats, twenty-two names.<br>
             One Fool, watching the Wheel turn.<br>
             What is spoken here stays here.
         </p>
-
         <p class="wheel-line">✦ &nbsp; Will you take a card? &nbsp; ✦</p>
-
         <div class="divider"></div>
-
         <nav aria-label="Main navigation">
             <a href="/register">Enter the Castle</a>
             <a href="/rules" class="secondary">Read the Rules</a>

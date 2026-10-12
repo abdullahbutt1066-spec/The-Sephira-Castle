@@ -42,51 +42,55 @@
         .topnav a { color: var(--accent); text-decoration: none; margin: 0 6px; }
         .topnav a:hover { filter: brightness(1.3); }
         h2 { font-size: 1.1em; color: var(--accent); margin-top: 36px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, #2a2536 80%); padding-bottom: 6px; }
-        .member-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 6px; margin-bottom: 8px; gap: 10px; }
+        .member-row {
+            display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
+                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.85)) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            margin-bottom: 8px; gap: 10px;
+        }
         .member-name { color: #d8d4e0; flex: 1; }
         .fool-tag { color: var(--accent); font-size: 0.85em; margin-left: 8px; }
-        button.remove { background: #5a2a3a; color: #f0c8c8; border: 1px solid #8a3a4a; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.85em; flex-shrink: 0; }
+        button.remove { background: #5a2a3a; color: #f0c8c8; border: 1px solid #8a3a4a; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.85em; flex-shrink: 0; }
         button.remove:hover { background: #7a3a4a; }
         .empty { color: #6a6380; font-style: italic; text-align: center; padding: 12px; }
-        .expulsion { padding: 8px 12px; background: color-mix(in srgb, #8a3a4a 15%, #1a1724 85%); border-left: 3px solid #8a3a4a; margin-bottom: 6px; font-size: 0.9em; color: #b8b0c8; }
+        .expulsion { padding: 10px 14px; background: color-mix(in srgb, #8a3a4a 15%, rgba(20, 18, 30, 0.85) 85%); border-left: 3px solid #8a3a4a; border-radius: 8px; margin-bottom: 6px; font-size: 0.9em; color: #b8b0c8; }
         .msg { text-align: center; color: #8fd18f; margin-bottom: 20px; font-size: 0.95em; }
         .action-form {
-            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
-            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
-            border-radius: 8px;
-            padding: 16px 20px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
+                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.85)) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            border-radius: 14px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+            padding: 18px 22px;
             margin-bottom: 12px;
         }
-        .action-form label {
-            display: block;
-            font-size: 0.85em;
-            color: #9a93a8;
-            margin: 10px 0 4px;
-        }
+        .action-form label { display: block; font-size: 0.85em; color: #9a93a8; margin: 10px 0 4px; }
         .action-form label:first-child { margin-top: 0; }
-        .action-form select,
-        .action-form input {
-            width: 100%;
-            padding: 8px 10px;
-            background: #14121a;
-            border: 1px solid #3a3450;
-            color: #d8d4e0;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.95em;
+        .action-form select, .action-form input {
+            width: 100%; padding: 8px 10px; background: rgba(20, 18, 26, 0.7);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            color: #d8d4e0; border-radius: 8px; font-family: inherit; font-size: 0.95em;
         }
         .action-form button {
-            margin-top: 14px;
-            padding: 10px 20px;
-            background: var(--accent);
-            border: none;
-            color: #fff;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.9em;
-            cursor: pointer;
+            margin-top: 14px; padding: 10px 20px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
+                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
+            color: #fff; border-radius: 10px; font-family: inherit; font-size: 0.9em; cursor: pointer;
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+            transition: filter 0.2s, transform 0.15s;
         }
-        .action-form button:hover { filter: brightness(1.2); }
+        .action-form button:hover { filter: brightness(1.15); transform: translateY(-1px); }
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.4em; }
@@ -120,7 +124,6 @@
         </div>
         <h1>The Fool's Chamber</h1>
         <p class="subtitle">Only The Fool sees this room.</p>
-
         {% if message %}<p class="msg">{{ message }}</p>{% endif %}
 
         <h2>Members</h2>
@@ -132,17 +135,14 @@
                         {% if m.is_fool %}<span class="fool-tag">✦ The Fool</span>{% endif %}
                     </span>
                     {% if not m.is_fool %}
-                        <form method="post" action="/admin/remove" style="margin:0;"
-                              onsubmit="return confirm('Expel {{ m.title }} {{ m.display }}? This cannot be undone.');">
+                        <form method="post" action="/admin/remove" style="margin:0;" onsubmit="return confirm('Expel {{ m.title }} {{ m.display }}? This cannot be undone.');">
                             <input type="hidden" name="codename" value="{{ m.codename }}">
                             <button type="submit" class="remove">Remove</button>
                         </form>
                     {% endif %}
                 </div>
             {% endfor %}
-        {% else %}
-            <p class="empty">No members.</p>
-        {% endif %}
+        {% else %}<p class="empty">No members.</p>{% endif %}
 
         <h2>Change a Member's Password</h2>
         {% if candidates %}
@@ -154,18 +154,13 @@
                         <option value="{{ c.codename }}">{{ c.title }} {{ c.display }}</option>
                     {% endfor %}
                 </select>
-
                 <label for="new_password">New Password</label>
                 <input type="password" id="new_password" name="new_password" required>
-
                 <label for="confirm_password">Confirm Password</label>
                 <input type="password" id="confirm_password" name="confirm_password" required>
-
                 <button type="submit">Change Password</button>
             </form>
-        {% else %}
-            <p class="empty">No members to act on.</p>
-        {% endif %}
+        {% else %}<p class="empty">No members to act on.</p>{% endif %}
 
         <h2>Change a Member's Gender</h2>
         {% if candidates %}
@@ -177,27 +172,21 @@
                         <option value="{{ c.codename }}">{{ c.title }} {{ c.display }}</option>
                     {% endfor %}
                 </select>
-
                 <label for="new_gender">New Gender</label>
                 <select id="new_gender" name="new_gender" required>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                 </select>
-
                 <button type="submit">Change Gender</button>
             </form>
-        {% else %}
-            <p class="empty">No members to act on.</p>
-        {% endif %}
+        {% else %}<p class="empty">No members to act on.</p>{% endif %}
 
         <h2>Record of Expulsions</h2>
         {% if expulsions %}
             {% for e in expulsions %}
                 <div class="expulsion"><strong>{{ e.codename }}</strong> — expelled by {{ e.expelled_by }} on {{ e.expelled_at }}</div>
             {% endfor %}
-        {% else %}
-            <p class="empty">No one has been expelled.</p>
-        {% endif %}
+        {% else %}<p class="empty">No one has been expelled.</p>{% endif %}
     </div>
 </body>
 </html>

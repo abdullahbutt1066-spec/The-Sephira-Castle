@@ -28,8 +28,7 @@
         }
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
                     color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
@@ -38,8 +37,7 @@
                     transparent 0%,
                     rgba(10, 8, 18, 0.5) 60%,
                     rgba(3, 2, 8, 0.9) 100%);
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
         .wheel {
             position: fixed; top: 50%; left: 50%;
@@ -72,10 +70,15 @@
         .wheel span:nth-child(22) { transform: translate(-50%, -50%) rotate(343.64deg) translateY(-380px) rotate(-343.64deg); }
         .card {
             position: relative; z-index: 1;
-            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 18%, rgba(20, 18, 30, 0.55)) 0%,
+                color-mix(in srgb, var(--accent) 8%, rgba(10, 8, 18, 0.85)) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent 70%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
             padding: 40px 50px;
-            border: 1px solid color-mix(in srgb, var(--accent) 20%, #3a3450 80%);
-            border-radius: 8px;
             width: 340px; max-width: 100%;
         }
         h1 { text-align: center; font-size: 1.5em; margin-top: 0; }
@@ -83,8 +86,16 @@
         .rules-note a { color: var(--accent); text-decoration: none; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
         input, select { width: 100%; padding: 10px; background: #14121a; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 4px; font-family: inherit; font-size: 1em; }
-        button { width: 100%; margin-top: 22px; padding: 12px; background: var(--accent); border: none; color: #fff; border-radius: 4px; font-size: 1em; cursor: pointer; font-family: inherit; }
-        button:hover { filter: brightness(1.2); }
+        button { width: 100%; margin-top: 22px; padding: 12px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
+                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
+            color: #fff; border-radius: 10px; font-size: 1em; cursor: pointer; font-family: inherit;
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+            transition: filter 0.2s, transform 0.15s;
+        }
+        button:hover { filter: brightness(1.15); transform: translateY(-1px); }
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; }
         .msg.ok  { color: #8fd18f; }
         .msg.err { color: #d18f8f; }
@@ -160,12 +171,10 @@
                 recoveryBlock.classList.add('hidden');
                 recoveryInput.required = false;
                 emailInput.required = false;
-                // Clear values when hidden, so the browser doesn't try to validate leftover data
                 recoveryInput.value = '';
                 emailInput.value = '';
             }
         }
-
         codenameSelect.addEventListener('change', updateRecoveryBlock);
         updateRecoveryBlock();
     </script>

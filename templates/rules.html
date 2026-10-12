@@ -26,8 +26,7 @@
         }
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
                     color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
@@ -36,22 +35,58 @@
                     transparent 0%,
                     rgba(10, 8, 18, 0.5) 60%,
                     rgba(3, 2, 8, 0.9) 100%);
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
         .container { width: 100%; max-width: 640px; position: relative; z-index: 1; }
         h1 { text-align: center; font-size: 1.8em; color: var(--accent); margin-bottom: 0.2em; }
         .subtitle { text-align: center; color: #8a7fb0; font-style: italic; font-size: 0.95em; margin-bottom: 40px; }
-        h2 { font-size: 1.05em; color: var(--accent); margin-top: 32px; margin-bottom: 8px; letter-spacing: 1px; }
         p { color: #c8c0d8; line-height: 1.6; margin: 0 0 8px; }
-        .rule { background: color-mix(in srgb, var(--accent) 6%, #1a1724 94%); border: 1px solid color-mix(in srgb, var(--accent) 12%, #2a2536 88%); border-left: 3px solid var(--accent); border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; }
-        .rule h2 { margin-top: 0; font-size: 0.95em; text-transform: uppercase; }
+        .rule {
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
+                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.85)) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            border-radius: 14px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+            padding: 18px 22px;
+            margin-bottom: 16px;
+        }
+        .rule h2 {
+            font-size: 0.95em;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
         .closing { text-align: center; color: var(--accent); font-style: italic; margin: 40px 0 20px; font-size: 1em; }
         .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
-        .actions a { display: inline-block; padding: 12px 28px; font-size: 1em; text-decoration: none; color: #fff; background: var(--accent); border: 2px solid var(--accent); border-radius: 6px; transition: filter 0.15s; }
-        .actions a:hover { filter: brightness(1.2); }
-        .actions a.secondary { background: transparent; color: var(--accent); }
-        .actions a.secondary:hover { background: color-mix(in srgb, var(--accent) 15%, transparent 85%); color: #fff; }
+        .actions a {
+            display: inline-block; padding: 12px 28px; font-size: 1em; text-decoration: none; color: #fff;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
+                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+            transition: filter 0.2s, transform 0.15s;
+        }
+        .actions a:hover { filter: brightness(1.15); transform: translateY(-1px); }
+        .actions a.secondary {
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 12%, rgba(20, 18, 30, 0.5)) 0%,
+                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.7)) 100%);
+            color: var(--accent);
+            border-color: color-mix(in srgb, var(--accent) 35%, transparent 65%);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        }
+        .actions a.secondary:hover { background: linear-gradient(135deg,
+            color-mix(in srgb, var(--accent) 22%, rgba(20, 18, 30, 0.5)) 0%,
+            color-mix(in srgb, var(--accent) 12%, rgba(10, 8, 18, 0.7)) 100%);
+            color: #fff;
+        }
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.5em; }
@@ -113,5 +148,3 @@
     </div>
 </body>
 </html>
-
-

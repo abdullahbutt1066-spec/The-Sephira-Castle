@@ -43,14 +43,33 @@
         .topnav a:hover { filter: brightness(1.3); }
         .back { color: var(--accent); text-decoration: none; font-size: 0.9em; display: inline-block; margin-bottom: 20px; }
         .back:hover { filter: brightness(1.3); }
-        fieldset { background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        fieldset {
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
+                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.85)) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            border-radius: 14px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
         legend { color: var(--accent); padding: 0 10px; font-size: 0.95em; }
-        label { display: flex; align-items: center; padding: 10px 12px; cursor: pointer; border-radius: 4px; margin-bottom: 4px; }
+        label { display: flex; align-items: center; padding: 10px 12px; cursor: pointer; border-radius: 8px; margin-bottom: 4px; }
         label:hover { background: color-mix(in srgb, var(--accent) 12%, transparent 88%); }
         input[type="checkbox"] { margin-right: 12px; accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
-        button { width: 100%; padding: 14px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
-        button:hover:not(:disabled) { filter: brightness(1.2); }
-        button:disabled { opacity: 0.6; cursor: wait; }
+        button {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
+                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
+            color: #fff; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: inherit;
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+            transition: filter 0.2s, transform 0.15s;
+        }
+        button:hover { filter: brightness(1.15); transform: translateY(-1px); }
         .empty { color: #6a6380; font-style: italic; text-align: center; }
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
@@ -99,24 +118,5 @@
             <button type="submit">Open the Thread</button>
         </form>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', () => {
-                    const os = form.getAttribute('onsubmit') || '';
-                    if (os.includes('confirm')) return;
-                    const btn = form.querySelector('button[type="submit"]');
-                    if (btn && !btn.disabled) {
-                        setTimeout(() => {
-                            btn.disabled = true;
-                            btn.textContent = 'Working...';
-                        }, 0);
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>
-
-

@@ -43,8 +43,22 @@
         .topnav a:hover { filter: brightness(1.3); }
         .back { color: var(--accent); text-decoration: none; font-size: 0.9em; display: inline-block; margin-bottom: 20px; }
         .back:hover { filter: brightness(1.3); }
-        .messages { background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 8px; padding: 20px; min-height: 300px; max-height: 500px; overflow-y: auto; margin-bottom: 20px; }
-        .message { margin-bottom: 14px; padding: 12px 16px; border-radius: 8px; }
+        .messages {
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
+                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.85)) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .message { margin-bottom: 14px; padding: 12px 16px; border-radius: 10px; }
         .meta { font-size: 0.85em; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .meta .symbol { font-size: 1.3em; line-height: 1; }
         .meta .name { font-weight: bold; }
@@ -60,11 +74,19 @@
         .deleted-note { font-size: 0.75em; color: #8a3a4a; margin-top: 4px; font-style: italic; }
         .empty { color: #6a6380; text-align: center; font-style: italic; }
         form.new-message { display: flex; gap: 10px; }
-        input[type="text"] { flex: 1; padding: 12px; background: #1a1724; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 6px; font-family: inherit; font-size: 1em; min-width: 0; }
+        input[type="text"] { flex: 1; padding: 12px 16px; background: rgba(20, 18, 26, 0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%); color: #d8d4e0; border-radius: 12px; font-family: inherit; font-size: 1em; min-width: 0; }
         input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-        button.send { padding: 12px 24px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0; transition: opacity 0.15s; }
-        button.send:hover:not(:disabled) { filter: brightness(1.2); }
-        button.send:disabled { opacity: 0.6; cursor: wait; }
+        button.send {
+            padding: 12px 24px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
+                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
+            color: #fff; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0;
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+            transition: filter 0.2s, transform 0.15s;
+        }
+        button.send:hover { filter: brightness(1.15); transform: translateY(-1px); }
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.3em; }
@@ -129,21 +151,6 @@
         </form>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', () => {
-                    const os = form.getAttribute('onsubmit') || '';
-                    if (os.includes('confirm')) return;
-                    const btn = form.querySelector('button[type="submit"]');
-                    if (btn && !btn.disabled) {
-                        setTimeout(() => {
-                            btn.disabled = true;
-                            btn.textContent = 'Sending...';
-                        }, 0);
-                    }
-                });
-            });
-        });
         let isTyping = false;
         const input = document.querySelector('input[name="text"]');
         if (input) {
@@ -156,5 +163,3 @@
     </script>
 </body>
 </html>
-
-

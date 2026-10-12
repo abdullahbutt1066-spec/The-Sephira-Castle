@@ -50,10 +50,15 @@
         ul { list-style: none; padding: 0; max-width: 460px; margin: 0 auto; }
         li {
             margin: 10px 0;
-            padding: 12px 18px;
-            background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%);
-            border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%);
-            border-radius: 6px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
+                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.85)) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -72,8 +77,7 @@
             gap: 6px;
         }
         li .dot {
-            width: 8px;
-            height: 8px;
+            width: 8px; height: 8px;
             border-radius: 50%;
             background: #5a5560;
             flex-shrink: 0;
@@ -93,7 +97,7 @@
             .topnav { font-size: 0.85em; }
             .topnav a { margin: 0 4px; }
             ul { max-width: 100%; }
-            li { padding: 10px 14px; font-size: 0.95em; flex-wrap: wrap; }
+            li { padding: 12px 14px; font-size: 0.95em; flex-wrap: wrap; }
             li .status { font-size: 0.75em; }
             .bg-symbol { font-size: 20rem; opacity: 0.04; }
         }

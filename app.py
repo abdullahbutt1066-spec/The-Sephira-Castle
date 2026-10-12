@@ -35,8 +35,6 @@ app.jinja_env.filters["reltime"] = relative_time
 
 @app.before_request
 def update_last_seen():
-    """Touch the logged-in user's last_seen on every request, except static assets."""
-    # Skip static files and the service worker to avoid unnecessary DB writes
     if request.path.startswith("/static/") or request.path == "/sw.js" or request.path == "/favicon.ico":
         return
     user = session.get("user")
@@ -337,7 +335,6 @@ def members():
             "status": auth.status_text(last_seen),
         })
 
-    # Sort: online first, then by last_seen desc, then alphabetical
     listing.sort(key=lambda m: (not m["online"], m["display"]))
 
     return render_template(
@@ -446,11 +443,15 @@ def admin():
             "is_fool": info.get("is_fool", False),
         })
 
+    # Candidates for change actions: everyone except The Fool
+    candidates = [m for m in listing if not m["is_fool"]]
+
     expulsions = auth.load_expulsions()
 
     return render_template(
         "admin.html",
         members=listing,
+        candidates=candidates,
         expulsions=expulsions,
         message=request.args.get("msg"),
         is_fool=True,
@@ -481,6 +482,57 @@ def admin_remove():
     auth.remove_member(target)
 
     return redirect(url_for("admin", msg=f"{target} has been expelled."))
+
+
+@app.route("/admin/change-password", methods=["POST"])
+def admin_change_password():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members or not members[user].get("is_fool"):
+        return redirect(url_for("members"))
+
+    target = request.form.get("codename", "").strip()
+    new_password = request.form.get("new_password", "").strip()
+    confirm = request.form.get("confirm_password", "").strip()
+
+    if not target or target not in members:
+        return redirect(url_for("admin", msg="Please choose a valid member."))
+    if target == "The Fool":
+        return redirect(url_for("admin", msg="Use your own recovery flow to change your password."))
+    if not new_password:
+        return redirect(url_for("admin", msg="New password cannot be empty."))
+    if new_password != confirm:
+        return redirect(url_for("admin", msg="Passwords do not match."))
+
+    auth.set_member_password(target, new_password)
+    return redirect(url_for("admin", msg=f"Password changed for {target}."))
+
+
+@app.route("/admin/change-gender", methods=["POST"])
+def admin_change_gender():
+    user = current_user()
+    if not user:
+        return redirect(url_for("login"))
+
+    members = auth.load_members()
+    if user not in members or not members[user].get("is_fool"):
+        return redirect(url_for("members"))
+
+    target = request.form.get("codename", "").strip()
+    new_gender = request.form.get("new_gender", "").strip().lower()
+
+    if not target or target not in members:
+        return redirect(url_for("admin", msg="Please choose a valid member."))
+    if target == "The Fool":
+        return redirect(url_for("admin", msg="You cannot change your own gender here."))
+    if new_gender not in ("male", "female"):
+        return redirect(url_for("admin", msg="Please choose a valid gender."))
+
+    auth.set_member_gender(target, new_gender)
+    return redirect(url_for("admin", msg=f"Gender changed for {target}."))
 
 
 @app.route("/messages")

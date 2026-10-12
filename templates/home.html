@@ -22,11 +22,15 @@
             padding: 80px 20px;
             margin: 0;
             min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
                     color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
@@ -35,13 +39,84 @@
                     transparent 0%,
                     rgba(10, 8, 18, 0.5) 60%,
                     rgba(3, 2, 8, 0.9) 100%);
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
-        main, nav { position: relative; z-index: 1; }
-        h1 { font-size: 2.5em; margin-bottom: 0.2em; }
-        p { color: #b8b0c8; font-size: 1.05em; }
-        nav { margin-top: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+        .wheel {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 900px; height: 900px;
+            pointer-events: none; z-index: 0; opacity: 0.05;
+            animation: slowspin 240s linear infinite;
+        }
+        .wheel span { position: absolute; top: 50%; left: 50%; font-size: 2.5rem; color: #d8d4e0; line-height: 1; }
+        .wheel span:nth-child(1)  { transform: translate(-50%, -50%) rotate(0deg)   translateY(-380px) rotate(0deg); }
+        .wheel span:nth-child(2)  { transform: translate(-50%, -50%) rotate(16.36deg) translateY(-380px) rotate(-16.36deg); }
+        .wheel span:nth-child(3)  { transform: translate(-50%, -50%) rotate(32.73deg) translateY(-380px) rotate(-32.73deg); }
+        .wheel span:nth-child(4)  { transform: translate(-50%, -50%) rotate(49.09deg) translateY(-380px) rotate(-49.09deg); }
+        .wheel span:nth-child(5)  { transform: translate(-50%, -50%) rotate(65.45deg) translateY(-380px) rotate(-65.45deg); }
+        .wheel span:nth-child(6)  { transform: translate(-50%, -50%) rotate(81.82deg) translateY(-380px) rotate(-81.82deg); }
+        .wheel span:nth-child(7)  { transform: translate(-50%, -50%) rotate(98.18deg) translateY(-380px) rotate(-98.18deg); }
+        .wheel span:nth-child(8)  { transform: translate(-50%, -50%) rotate(114.55deg) translateY(-380px) rotate(-114.55deg); }
+        .wheel span:nth-child(9)  { transform: translate(-50%, -50%) rotate(130.91deg) translateY(-380px) rotate(-130.91deg); }
+        .wheel span:nth-child(10) { transform: translate(-50%, -50%) rotate(147.27deg) translateY(-380px) rotate(-147.27deg); }
+        .wheel span:nth-child(11) { transform: translate(-50%, -50%) rotate(163.64deg) translateY(-380px) rotate(-163.64deg); }
+        .wheel span:nth-child(12) { transform: translate(-50%, -50%) rotate(180deg)   translateY(-380px) rotate(-180deg); }
+        .wheel span:nth-child(13) { transform: translate(-50%, -50%) rotate(196.36deg) translateY(-380px) rotate(-196.36deg); }
+        .wheel span:nth-child(14) { transform: translate(-50%, -50%) rotate(212.73deg) translateY(-380px) rotate(-212.73deg); }
+        .wheel span:nth-child(15) { transform: translate(-50%, -50%) rotate(229.09deg) translateY(-380px) rotate(-229.09deg); }
+        .wheel span:nth-child(16) { transform: translate(-50%, -50%) rotate(245.45deg) translateY(-380px) rotate(-245.45deg); }
+        .wheel span:nth-child(17) { transform: translate(-50%, -50%) rotate(261.82deg) translateY(-380px) rotate(-261.82deg); }
+        .wheel span:nth-child(18) { transform: translate(-50%, -50%) rotate(278.18deg) translateY(-380px) rotate(-278.18deg); }
+        .wheel span:nth-child(19) { transform: translate(-50%, -50%) rotate(294.55deg) translateY(-380px) rotate(-294.55deg); }
+        .wheel span:nth-child(20) { transform: translate(-50%, -50%) rotate(310.91deg) translateY(-380px) rotate(-310.91deg); }
+        .wheel span:nth-child(21) { transform: translate(-50%, -50%) rotate(327.27deg) translateY(-380px) rotate(-327.27deg); }
+        .wheel span:nth-child(22) { transform: translate(-50%, -50%) rotate(343.64deg) translateY(-380px) rotate(-343.64deg); }
+        @keyframes slowspin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to   { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        main { position: relative; z-index: 1; max-width: 640px; }
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 0.2em;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 40%, transparent 60%);
+            animation: fadeDown 1.4s ease-out;
+        }
+        .invitation {
+            color: #b8b0c8;
+            font-size: 1.05em;
+            line-height: 1.7;
+            font-style: italic;
+            margin: 24px 0 8px;
+            animation: fadeIn 2s ease-out 0.4s both;
+        }
+        .wheel-line {
+            color: #8a7fb0;
+            font-size: 0.9em;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 26px;
+            margin-bottom: 34px;
+            animation: fadeIn 2s ease-out 0.9s both;
+        }
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: var(--accent);
+            margin: 20px auto;
+            opacity: 0.5;
+            animation: fadeIn 1s ease-out 1.2s both;
+        }
+        nav {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            animation: fadeUp 1.6s ease-out 1.4s both;
+        }
         nav a {
             display: inline-block;
             padding: 14px 32px;
@@ -52,16 +127,46 @@
             background: var(--accent);
             border: 2px solid var(--accent);
             border-radius: 6px;
-            transition: filter 0.15s;
+            transition: filter 0.2s, transform 0.2s;
         }
-        nav a:hover, nav a:focus { filter: brightness(1.2); outline: 3px solid var(--accent); outline-offset: 3px; }
-        nav a.secondary { background: transparent; color: var(--accent); border-color: var(--accent); }
-        nav a.secondary:hover, nav a.secondary:focus { background: color-mix(in srgb, var(--accent) 15%, transparent 85%); color: #fff; }
+        nav a:hover, nav a:focus {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+        }
+        nav a.secondary {
+            background: transparent;
+            color: var(--accent);
+        }
+        nav a.secondary:hover, nav a.secondary:focus {
+            background: color-mix(in srgb, var(--accent) 15%, transparent 85%);
+            color: #fff;
+        }
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .wheel, h1, .invitation, .wheel-line, .divider, nav {
+                animation: none !important;
+            }
+        }
         @media (max-width: 600px) {
             body { padding: 40px 16px; }
-            h1 { font-size: 1.9em; }
-            p { font-size: 1em; }
-            nav { margin-top: 35px; flex-direction: column; align-items: stretch; }
+            h1 { font-size: 2em; }
+            .invitation { font-size: 0.98em; }
+            .wheel-line { font-size: 0.82em; letter-spacing: 2px; }
+            .wheel { width: 500px; height: 500px; }
+            nav { margin-top: 5px; flex-direction: column; align-items: stretch; gap: 10px; }
             nav a { width: 100%; padding: 14px 20px; font-size: 1em; }
         }
     </style>
@@ -74,9 +179,22 @@
             });
         }
     </script>
+    <div class="wheel" aria-hidden="true">
+        {% for sym in all_symbols %}<span>{{ sym }}</span>{% endfor %}
+    </div>
     <main>
-        <h1>Welcome to The Sephira Castle</h1>
-        <p>The gathering is not yet in session.</p>
+        <h1>The Sephira Castle</h1>
+
+        <p class="invitation">
+            Twenty-two seats, twenty-two names.<br>
+            One Fool, watching the Wheel turn.<br>
+            What is spoken here stays here.
+        </p>
+
+        <p class="wheel-line">✦ &nbsp; Will you take a card? &nbsp; ✦</p>
+
+        <div class="divider"></div>
+
         <nav aria-label="Main navigation">
             <a href="/register">Enter the Castle</a>
             <a href="/rules" class="secondary">Read the Rules</a>
@@ -85,5 +203,3 @@
     </main>
 </body>
 </html>
-
-

@@ -86,7 +86,7 @@ def client_ip():
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    return render_template("home.html", all_symbols=auth.all_card_symbols())
 
 
 @app.route("/rules")
@@ -443,7 +443,6 @@ def admin():
             "is_fool": info.get("is_fool", False),
         })
 
-    # Candidates for change actions: everyone except The Fool
     candidates = [m for m in listing if not m["is_fool"]]
 
     expulsions = auth.load_expulsions()

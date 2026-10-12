@@ -136,8 +136,10 @@
                     if (os.includes('confirm')) return;
                     const btn = form.querySelector('button[type="submit"]');
                     if (btn && !btn.disabled) {
-                        btn.disabled = true;
-                        btn.textContent = 'Sending...';
+                        setTimeout(() => {
+                            btn.disabled = true;
+                            btn.textContent = 'Sending...';
+                        }, 0);
                     }
                 });
             });
@@ -154,3 +156,5 @@
     </script>
 </body>
 </html>
+
+

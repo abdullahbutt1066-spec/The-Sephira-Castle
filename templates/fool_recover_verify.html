@@ -98,8 +98,10 @@
                     if (os.includes('confirm')) return;
                     const btn = form.querySelector('button[type="submit"]');
                     if (btn && !btn.disabled) {
-                        btn.disabled = true;
-                        btn.textContent = 'Working...';
+                        setTimeout(() => {
+                            btn.disabled = true;
+                            btn.textContent = 'Working...';
+                        }, 0);
                     }
                 });
             });
@@ -107,3 +109,5 @@
     </script>
 </body>
 </html>
+
+

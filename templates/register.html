@@ -83,9 +83,8 @@
         .rules-note a { color: var(--accent); text-decoration: none; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
         input, select { width: 100%; padding: 10px; background: #14121a; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 4px; font-family: inherit; font-size: 1em; }
-        button { width: 100%; margin-top: 22px; padding: 12px; background: var(--accent); border: none; color: #fff; border-radius: 4px; font-size: 1em; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
-        button:hover:not(:disabled) { filter: brightness(1.2); }
-        button:disabled { opacity: 0.6; cursor: wait; }
+        button { width: 100%; margin-top: 22px; padding: 12px; background: var(--accent); border: none; color: #fff; border-radius: 4px; font-size: 1em; cursor: pointer; font-family: inherit; }
+        button:hover { filter: brightness(1.2); }
         .msg { margin-top: 16px; text-align: center; font-size: 0.9em; }
         .msg.ok  { color: #8fd18f; }
         .msg.err { color: #d18f8f; }
@@ -150,8 +149,10 @@
         const recoveryBlock = document.getElementById('recovery-block');
         const recoveryInput = document.getElementById('recovery_password');
         const emailInput = document.getElementById('email');
-        codenameSelect.addEventListener('change', () => {
-            if (codenameSelect.value === 'The Fool') {
+
+        function updateRecoveryBlock() {
+            const isFool = codenameSelect.value === 'The Fool';
+            if (isFool) {
                 recoveryBlock.classList.remove('hidden');
                 recoveryInput.required = true;
                 emailInput.required = true;
@@ -159,21 +160,14 @@
                 recoveryBlock.classList.add('hidden');
                 recoveryInput.required = false;
                 emailInput.required = false;
+                // Clear values when hidden, so the browser doesn't try to validate leftover data
+                recoveryInput.value = '';
+                emailInput.value = '';
             }
-        });
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', () => {
-                    const os = form.getAttribute('onsubmit') || '';
-                    if (os.includes('confirm')) return;
-                    const btn = form.querySelector('button[type="submit"]');
-                    if (btn && !btn.disabled) {
-                        btn.disabled = true;
-                        btn.textContent = 'Working...';
-                    }
-                });
-            });
-        });
+        }
+
+        codenameSelect.addEventListener('change', updateRecoveryBlock);
+        updateRecoveryBlock();
     </script>
 </body>
 </html>

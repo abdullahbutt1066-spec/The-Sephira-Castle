@@ -12,20 +12,16 @@
     <meta name="apple-mobile-web-app-title" content="Sephira">
     <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
-        :root { --accent: {{ user_color }}; }
+        :root { --accent: {{ user_color }}; --secondary: {{ user_secondary }}; --radius: {{ user_radius }}; }
         * { box-sizing: border-box; }
         body { font-family: Georgia, serif; background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%); color: #d8d4e0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         body::before {
-            content: '';
-            position: fixed; inset: 0;
+            content: ''; position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
-                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
-                    transparent 60%),
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%, transparent 60%),
                 radial-gradient(ellipse at center,
-                    transparent 0%,
-                    rgba(10, 8, 18, 0.5) 60%,
-                    rgba(3, 2, 8, 0.9) 100%);
+                    transparent 0%, rgba(10, 8, 18, 0.5) 60%, rgba(3, 2, 8, 0.9) 100%);
             pointer-events: none; z-index: 0;
         }
         .bg-symbol {
@@ -44,16 +40,26 @@
         .back { color: var(--accent); text-decoration: none; font-size: 0.9em; display: inline-block; margin-bottom: 20px; }
         .back:hover { filter: brightness(1.3); }
         fieldset {
+            padding: 20px; margin-bottom: 20px;
+            border-radius: var(--radius);
             background: linear-gradient(135deg,
                 color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
-                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.85)) 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+                color-mix(in srgb, var(--secondary) 6%, rgba(10, 8, 18, 0.85)) 100%);
             border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
-            border-radius: 14px;
             box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
-            padding: 20px;
-            margin-bottom: 20px;
+        }
+        body.panel-frosted fieldset { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        body.panel-solid fieldset {
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 25%, rgba(20, 18, 30, 0.9)) 0%,
+                color-mix(in srgb, var(--secondary) 12%, rgba(8, 6, 14, 0.95)) 100%);
+            border: 2px solid var(--accent);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+        }
+        body.panel-outline fieldset {
+            background: color-mix(in srgb, var(--accent) 5%, transparent 95%);
+            border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent 45%);
+            box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 20%, transparent 80%);
         }
         legend { color: var(--accent); padding: 0 10px; font-size: 0.95em; }
         label { display: flex; align-items: center; padding: 10px 12px; cursor: pointer; border-radius: 8px; margin-bottom: 4px; }
@@ -63,9 +69,10 @@
             width: 100%; padding: 14px;
             background: linear-gradient(135deg,
                 color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
-                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+                color-mix(in srgb, var(--secondary) 60%, rgba(20, 18, 30, 0.6) 40%) 100%);
             border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
-            color: #fff; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: inherit;
+            color: #fff; border-radius: calc(var(--radius) * 0.75);
+            font-size: 1em; cursor: pointer; font-family: inherit;
             box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
             transition: filter 0.2s, transform 0.15s;
         }
@@ -83,12 +90,10 @@
         }
     </style>
 </head>
-<body>
+<body class="panel-{{ user_panel_style }}">
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
+            window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
         }
     </script>
     <div class="bg-symbol" aria-hidden="true">{{ my_symbol }}</div>

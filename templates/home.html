@@ -12,7 +12,11 @@
     <meta name="apple-mobile-web-app-title" content="Sephira">
     <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
-        :root { --accent: {{ user_color }}; }
+        :root {
+            --accent: {{ user_color }};
+            --secondary: {{ user_secondary }};
+            --radius: {{ user_radius }};
+        }
         * { box-sizing: border-box; }
         body {
             font-family: Georgia, serif;
@@ -23,14 +27,11 @@
             margin: 0;
             min-height: 100vh;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
         }
         body::before {
-            content: '';
-            position: fixed; inset: 0;
+            content: ''; position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
                     color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
@@ -77,58 +78,39 @@
         }
         main { position: relative; z-index: 1; max-width: 640px; }
         h1 {
-            font-size: 2.8em;
-            margin-bottom: 0.2em;
-            letter-spacing: 2px;
+            font-size: 2.8em; margin-bottom: 0.2em; letter-spacing: 2px;
             color: var(--accent);
             text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 40%, transparent 60%);
             animation: fadeDown 1.4s ease-out;
         }
         .invitation {
-            color: #b8b0c8;
-            font-size: 1.05em;
-            line-height: 1.7;
-            font-style: italic;
-            margin: 24px 0 8px;
+            color: #b8b0c8; font-size: 1.05em; line-height: 1.7;
+            font-style: italic; margin: 24px 0 8px;
             animation: fadeIn 2s ease-out 0.4s both;
         }
         .wheel-line {
-            color: #8a7fb0;
-            font-size: 0.9em;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-top: 26px;
-            margin-bottom: 34px;
+            color: #8a7fb0; font-size: 0.9em; letter-spacing: 3px;
+            text-transform: uppercase; margin-top: 26px; margin-bottom: 34px;
             animation: fadeIn 2s ease-out 0.9s both;
         }
         .divider {
-            width: 60px;
-            height: 1px;
-            background: var(--accent);
-            margin: 20px auto;
-            opacity: 0.5;
+            width: 60px; height: 1px; background: var(--accent);
+            margin: 20px auto; opacity: 0.5;
             animation: fadeIn 1s ease-out 1.2s both;
         }
         nav {
-            margin-top: 8px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 14px;
+            margin-top: 8px; display: flex; flex-wrap: wrap;
+            justify-content: center; gap: 14px;
             animation: fadeUp 1.6s ease-out 1.4s both;
         }
         nav a {
-            display: inline-block;
-            padding: 14px 32px;
-            font-size: 1.05em;
-            font-family: inherit;
-            text-decoration: none;
-            color: #fff;
+            display: inline-block; padding: 14px 32px;
+            font-size: 1.05em; font-family: inherit; text-decoration: none; color: #fff;
             background: linear-gradient(135deg,
                 color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
-                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+                color-mix(in srgb, var(--secondary) 60%, rgba(20, 18, 30, 0.6) 40%) 100%);
             border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
-            border-radius: 14px;
+            border-radius: calc(var(--radius) * 0.75);
             box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
             transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
         }
@@ -136,41 +118,35 @@
             filter: brightness(1.15);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 50%, transparent 50%);
-            outline: 3px solid var(--accent);
-            outline-offset: 3px;
+            outline: 3px solid var(--accent); outline-offset: 3px;
         }
         nav a.secondary {
-            background: linear-gradient(135deg,
-                color-mix(in srgb, var(--accent) 12%, rgba(20, 18, 30, 0.5)) 0%,
-                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.7)) 100%);
+            background: color-mix(in srgb, var(--accent) 8%, rgba(20, 18, 30, 0.6) 92%);
             color: var(--accent);
             border-color: color-mix(in srgb, var(--accent) 35%, transparent 65%);
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        }
+        body.panel-frosted nav a.secondary {
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+        body.panel-solid nav a.secondary {
+            background: color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.9) 85%);
+            border-width: 2px;
+        }
+        body.panel-outline nav a.secondary {
+            background: transparent;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
         }
         nav a.secondary:hover, nav a.secondary:focus {
-            background: linear-gradient(135deg,
-                color-mix(in srgb, var(--accent) 22%, rgba(20, 18, 30, 0.5)) 0%,
-                color-mix(in srgb, var(--accent) 12%, rgba(10, 8, 18, 0.7)) 100%);
             color: #fff;
+            background: color-mix(in srgb, var(--accent) 22%, rgba(20, 18, 30, 0.6) 78%);
         }
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp   { from { opacity: 0; transform: translateY(20px); }  to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
         @media (prefers-reduced-motion: reduce) {
-            .wheel, h1, .invitation, .wheel-line, .divider, nav {
-                animation: none !important;
-            }
+            .wheel, h1, .invitation, .wheel-line, .divider, nav { animation: none !important; }
         }
         @media (max-width: 600px) {
             body { padding: 40px 16px; }
@@ -183,7 +159,7 @@
         }
     </style>
 </head>
-<body>
+<body class="panel-{{ user_panel_style }}">
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

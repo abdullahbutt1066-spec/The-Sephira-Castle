@@ -12,57 +12,66 @@
     <meta name="apple-mobile-web-app-title" content="Sephira">
     <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
-        :root { --accent: {{ user_color }}; }
+        :root { --accent: {{ user_color }}; --secondary: {{ user_secondary }}; --radius: {{ user_radius }}; }
         * { box-sizing: border-box; }
         body {
             font-family: Georgia, serif;
             background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
             color: #d8d4e0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; padding: 20px;
         }
         body::before {
-            content: '';
-            position: fixed; inset: 0;
+            content: ''; position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
-                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
-                    transparent 60%),
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%, transparent 60%),
                 radial-gradient(ellipse at center,
-                    transparent 0%,
-                    rgba(10, 8, 18, 0.5) 60%,
-                    rgba(3, 2, 8, 0.9) 100%);
+                    transparent 0%, rgba(10, 8, 18, 0.5) 60%, rgba(3, 2, 8, 0.9) 100%);
             pointer-events: none; z-index: 0;
         }
         .card {
             position: relative; z-index: 1;
+            padding: 40px 50px;
+            width: 340px; max-width: 100%;
+            border-radius: var(--radius);
             background: linear-gradient(135deg,
                 color-mix(in srgb, var(--accent) 18%, rgba(20, 18, 30, 0.55)) 0%,
-                color-mix(in srgb, var(--accent) 8%, rgba(10, 8, 18, 0.85)) 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+                color-mix(in srgb, var(--secondary) 8%, rgba(10, 8, 18, 0.85)) 100%);
             border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent 70%);
-            border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-            padding: 40px 50px;
-            width: 340px;
-            max-width: 100%;
+        }
+        body.panel-frosted .card { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        body.panel-solid .card {
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 25%, rgba(20, 18, 30, 0.9)) 0%,
+                color-mix(in srgb, var(--secondary) 12%, rgba(8, 6, 14, 0.95)) 100%);
+            border: 2px solid var(--accent);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+        }
+        body.panel-outline .card {
+            background: color-mix(in srgb, var(--accent) 5%, transparent 95%);
+            border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent 45%);
+            box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 25%, transparent 75%);
         }
         h1 { text-align: center; font-size: 1.4em; margin-top: 0; }
         p { color: #b8b0c8; font-size: 0.9em; text-align: center; }
         label { display: block; margin: 14px 0 4px; font-size: 0.9em; color: #9a93a8; }
-        input { width: 100%; padding: 10px; background: #14121a; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 4px; font-family: inherit; font-size: 1em; }
+        input {
+            width: 100%; padding: 10px;
+            background: rgba(20, 18, 26, 0.7);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            color: #d8d4e0; border-radius: calc(var(--radius) * 0.6);
+            font-family: inherit; font-size: 1em;
+        }
         button {
             width: 100%; margin-top: 22px; padding: 12px;
             background: linear-gradient(135deg,
                 color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
-                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+                color-mix(in srgb, var(--secondary) 60%, rgba(20, 18, 30, 0.6) 40%) 100%);
             border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
-            color: #fff; border-radius: 10px; font-size: 1em; cursor: pointer; font-family: inherit;
+            color: #fff; border-radius: calc(var(--radius) * 0.75);
+            font-size: 1em; cursor: pointer; font-family: inherit;
             box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
             transition: filter 0.2s, transform 0.15s;
         }
@@ -75,12 +84,10 @@
         }
     </style>
 </head>
-<body>
+<body class="panel-{{ user_panel_style }}">
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
+            window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
         }
     </script>
     <div class="card">

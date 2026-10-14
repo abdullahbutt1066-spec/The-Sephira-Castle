@@ -12,32 +12,22 @@
     <meta name="apple-mobile-web-app-title" content="Sephira">
     <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
-        :root { --accent: {{ user_color }}; }
+        :root { --accent: {{ user_color }}; --secondary: {{ user_secondary }}; --radius: {{ user_radius }}; }
         * { box-sizing: border-box; }
         body {
             font-family: Georgia, serif;
             background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
             color: #d8d4e0;
-            text-align: center;
-            padding: 80px 20px;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            text-align: center; padding: 80px 20px; margin: 0; min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         body::before {
-            content: '';
-            position: fixed; inset: 0;
+            content: ''; position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
-                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
-                    transparent 60%),
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%, transparent 60%),
                 radial-gradient(ellipse at center,
-                    transparent 0%,
-                    rgba(10, 8, 18, 0.5) 60%,
-                    rgba(3, 2, 8, 0.9) 100%);
+                    transparent 0%, rgba(10, 8, 18, 0.5) 60%, rgba(3, 2, 8, 0.9) 100%);
             pointer-events: none; z-index: 0;
         }
         main { position: relative; z-index: 1; }
@@ -49,27 +39,29 @@
             display: inline-block; padding: 12px 28px; font-size: 1em; text-decoration: none; color: #fff;
             background: linear-gradient(135deg,
                 color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
-                color-mix(in srgb, var(--accent) 70%, rgba(20, 18, 30, 0.6) 30%) 100%);
+                color-mix(in srgb, var(--secondary) 60%, rgba(20, 18, 30, 0.6) 40%) 100%);
             border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
-            border-radius: 12px;
+            border-radius: calc(var(--radius) * 0.75);
             box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
             transition: filter 0.2s, transform 0.15s;
         }
         nav a:hover { filter: brightness(1.15); transform: translateY(-1px); }
         nav a.secondary {
-            background: linear-gradient(135deg,
-                color-mix(in srgb, var(--accent) 12%, rgba(20, 18, 30, 0.5)) 0%,
-                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.7)) 100%);
+            background: color-mix(in srgb, var(--accent) 8%, rgba(20, 18, 30, 0.6) 92%);
             color: var(--accent);
             border-color: color-mix(in srgb, var(--accent) 35%, transparent 65%);
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
         }
-        nav a.secondary:hover {
-            background: linear-gradient(135deg,
-                color-mix(in srgb, var(--accent) 22%, rgba(20, 18, 30, 0.5)) 0%,
-                color-mix(in srgb, var(--accent) 12%, rgba(10, 8, 18, 0.7)) 100%);
-            color: #fff;
+        body.panel-solid nav a.secondary {
+            background: color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.9) 85%);
+            border-width: 2px;
         }
+        body.panel-outline nav a.secondary {
+            background: transparent;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+        }
+        nav a.secondary:hover { color: #fff; background: color-mix(in srgb, var(--accent) 22%, rgba(20, 18, 30, 0.6) 78%); }
         @media (max-width: 600px) {
             body { padding: 40px 16px; }
             h1 { font-size: 3em; }
@@ -79,12 +71,10 @@
         }
     </style>
 </head>
-<body>
+<body class="panel-{{ user_panel_style }}">
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
+            window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
         }
     </script>
     <main>

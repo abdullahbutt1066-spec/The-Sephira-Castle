@@ -12,29 +12,22 @@
     <meta name="apple-mobile-web-app-title" content="Sephira">
     <link rel="apple-touch-icon" href="/static/icon.svg">
     <style>
-        :root { --accent: {{ user_color }}; }
+        :root { --accent: {{ user_color }}; --secondary: {{ user_secondary }}; --radius: {{ user_radius }}; }
         * { box-sizing: border-box; }
         body {
             font-family: Georgia, serif;
             background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%);
             color: #d8d4e0;
-            text-align: center;
-            padding: 80px 20px;
-            margin: 0;
-            min-height: 100vh;
-            overflow-x: hidden;
+            text-align: center; padding: 80px 20px; margin: 0;
+            min-height: 100vh; overflow-x: hidden;
         }
         body::before {
-            content: '';
-            position: fixed; inset: 0;
+            content: ''; position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
-                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
-                    transparent 60%),
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%, transparent 60%),
                 radial-gradient(ellipse at center,
-                    transparent 0%,
-                    rgba(10, 8, 18, 0.5) 60%,
-                    rgba(3, 2, 8, 0.9) 100%);
+                    transparent 0%, rgba(10, 8, 18, 0.5) 60%, rgba(3, 2, 8, 0.9) 100%);
             pointer-events: none; z-index: 0;
         }
         .bg-symbol {
@@ -51,41 +44,33 @@
         li {
             margin: 10px 0;
             padding: 14px 18px;
+            border-radius: var(--radius);
             background: linear-gradient(135deg,
                 color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
-                color-mix(in srgb, var(--accent) 6%, rgba(10, 8, 18, 0.85)) 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+                color-mix(in srgb, var(--secondary) 6%, rgba(10, 8, 18, 0.85)) 100%);
             border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
-            border-radius: 14px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.05em;
-            text-align: left;
+            display: flex; align-items: center; gap: 12px;
+            font-size: 1.05em; text-align: left;
+        }
+        body.panel-frosted li { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        body.panel-solid li {
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 25%, rgba(20, 18, 30, 0.9)) 0%,
+                color-mix(in srgb, var(--secondary) 12%, rgba(8, 6, 14, 0.95)) 100%);
+            border: 2px solid var(--accent);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+        }
+        body.panel-outline li {
+            background: color-mix(in srgb, var(--accent) 5%, transparent 95%);
+            border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent 45%);
+            box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 20%, transparent 80%);
         }
         li .symbol { font-size: 1.4em; line-height: 1; flex-shrink: 0; }
         li .name { font-weight: bold; }
-        li .status {
-            margin-left: auto;
-            font-size: 0.8em;
-            color: #8a7fb0;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        li .dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: #5a5560;
-            flex-shrink: 0;
-        }
-        li .dot.online {
-            background: #42c878;
-            box-shadow: 0 0 6px #42c878;
-        }
+        li .status { margin-left: auto; font-size: 0.8em; color: #8a7fb0; flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+        li .dot { width: 8px; height: 8px; border-radius: 50%; background: #5a5560; flex-shrink: 0; }
+        li .dot.online { background: #42c878; box-shadow: 0 0 6px #42c878; }
         li .fool-star { color: var(--accent); font-size: 0.85em; }
         .topnav { margin-bottom: 30px; font-size: 0.9em; line-height: 1.8; }
         .topnav a { color: var(--accent); text-decoration: none; margin: 0 6px; }
@@ -103,12 +88,10 @@
         }
     </style>
 </head>
-<body>
+<body class="panel-{{ user_panel_style }}">
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
+            window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
         }
     </script>
     <div class="bg-symbol" aria-hidden="true">{{ my_symbol }}</div>

@@ -24,19 +24,104 @@ CARD_SYMBOLS = {
     "The World": "⊕",
 }
 
-CARD_COLORS = {
-    "The Fool": "#7e83d6", "The Magician": "#e84848",
-    "The High Priestess": "#5a70c8", "The Empress": "#cc3f83",
-    "The Emperor": "#fff200", "The Hierophant": "#b8b8b8",
-    "The Lovers": "#a878d8", "The Chariot": "#6090d8",
-    "Strength": "#a8a8a8", "The Hermit": "#8a8a95",
-    "Wheel of Fortune": "#42dbc9", "Justice": "#c8a04a",
-    "The Hanged Man": "#5a7ab0", "Death": "#3e4141",
-    "Temperance": "#d8d4c8", "The Devil": "#a82838",
-    "The Tower": "#c87848", "The Star": "#78b8e8",
-    "The Moon": "#6a80b8", "The Sun": "#f0c040",
-    "Judgement": "#8898b8", "The World": "#662121",
+# Each card carries a full visual theme, not just a color.
+#   primary, secondary  — hex colors
+#   radius              — panel corner radius
+#   panel_style         — "frosted" | "solid" | "outline"
+#   mood                — thematic label (reserved for future styling)
+CARD_THEMES = {
+    "The Fool": {
+        "primary": "#7e83d6", "secondary": "#f0d850",
+        "radius": "20px", "panel_style": "frosted", "mood": "playful",
+    },
+    "The Magician": {
+        "primary": "#e84848", "secondary": "#e8c850",
+        "radius": "12px", "panel_style": "frosted", "mood": "bold",
+    },
+    "The High Priestess": {
+        "primary": "#5a70c8", "secondary": "#d8d4c8",
+        "radius": "8px", "panel_style": "outline", "mood": "mysterious",
+    },
+    "The Empress": {
+        "primary": "#cc3f83", "secondary": "#6bb56b",
+        "radius": "18px", "panel_style": "frosted", "mood": "lush",
+    },
+    "The Emperor": {
+        "primary": "#fff200", "secondary": "#a82838",
+        "radius": "4px", "panel_style": "solid", "mood": "imperial",
+    },
+    "The Hierophant": {
+        "primary": "#b8b8b8", "secondary": "#8a6a30",
+        "radius": "6px", "panel_style": "outline", "mood": "traditional",
+    },
+    "The Lovers": {
+        "primary": "#a878d8", "secondary": "#f0a0b0",
+        "radius": "18px", "panel_style": "frosted", "mood": "warm",
+    },
+    "The Chariot": {
+        "primary": "#6090d8", "secondary": "#d8a838",
+        "radius": "8px", "panel_style": "solid", "mood": "driven",
+    },
+    "Strength": {
+        "primary": "#a8a8a8", "secondary": "#c8a04a",
+        "radius": "12px", "panel_style": "frosted", "mood": "grounded",
+    },
+    "The Hermit": {
+        "primary": "#8a8a95", "secondary": "#5a70c8",
+        "radius": "10px", "panel_style": "outline", "mood": "introspective",
+    },
+    "Wheel of Fortune": {
+        "primary": "#42dbc9", "secondary": "#d8a838",
+        "radius": "20px", "panel_style": "frosted", "mood": "spinning",
+    },
+    "Justice": {
+        "primary": "#c8a04a", "secondary": "#c8d8e8",
+        "radius": "4px", "panel_style": "solid", "mood": "precise",
+    },
+    "The Hanged Man": {
+        "primary": "#5a7ab0", "secondary": "#d8d4c8",
+        "radius": "14px", "panel_style": "outline", "mood": "suspended",
+    },
+    "Death": {
+        "primary": "#3e4141", "secondary": "#7a7a85",
+        "radius": "2px", "panel_style": "solid", "mood": "stark",
+    },
+    "Temperance": {
+        "primary": "#d8d4c8", "secondary": "#a0d8c8",
+        "radius": "16px", "panel_style": "frosted", "mood": "balanced",
+    },
+    "The Devil": {
+        "primary": "#a82838", "secondary": "#662121",
+        "radius": "6px", "panel_style": "solid", "mood": "sharp",
+    },
+    "The Tower": {
+        "primary": "#c87848", "secondary": "#a82838",
+        "radius": "2px", "panel_style": "solid", "mood": "broken",
+    },
+    "The Star": {
+        "primary": "#78b8e8", "secondary": "#f0c040",
+        "radius": "20px", "panel_style": "frosted", "mood": "radiant",
+    },
+    "The Moon": {
+        "primary": "#6a80b8", "secondary": "#a878d8",
+        "radius": "18px", "panel_style": "outline", "mood": "misty",
+    },
+    "The Sun": {
+        "primary": "#f0c040", "secondary": "#e84848",
+        "radius": "20px", "panel_style": "frosted", "mood": "bright",
+    },
+    "Judgement": {
+        "primary": "#8898b8", "secondary": "#c8d8e8",
+        "radius": "8px", "panel_style": "outline", "mood": "resolute",
+    },
+    "The World": {
+        "primary": "#662121", "secondary": "#7ac8a0",
+        "radius": "16px", "panel_style": "frosted", "mood": "complete",
+    },
 }
+
+# Backward-compatible color map derived from themes.
+CARD_COLORS = {card: t["primary"] for card, t in CARD_THEMES.items()}
 
 IP_LIMIT = 3
 DEVICE_LIMIT = 2
@@ -139,7 +224,6 @@ def status_text(last_seen_str):
 
 
 def set_member_password(codename, new_password):
-    """Generate a fresh salt, hash the new password, and update."""
     new_salt = make_salt()
     new_hash = hash_password(new_password, new_salt)
     with get_connection() as conn:
@@ -246,7 +330,23 @@ def get_fool():
 
 
 def get_card_decorations(codename):
-    return CARD_SYMBOLS.get(codename, "·"), CARD_COLORS.get(codename, "#b8b0c8")
+    """Backward-compatible: returns (symbol, primary_color)."""
+    symbol = CARD_SYMBOLS.get(codename, "·")
+    theme = CARD_THEMES.get(codename)
+    color = theme["primary"] if theme else "#b8b0c8"
+    return symbol, color
+
+
+def get_card_theme(codename):
+    """Return the full theme dict for a card, or a neutral fallback."""
+    fallback = {
+        "primary": "#6a4fa3", "secondary": "#c4a8ff",
+        "radius": "16px", "panel_style": "frosted", "mood": "neutral",
+    }
+    theme = CARD_THEMES.get(codename)
+    if not theme:
+        return fallback
+    return theme
 
 
 def all_card_symbols():

@@ -58,19 +58,35 @@ def inject_nav_unread():
 
 @app.context_processor
 def inject_user_theme():
+    """Provide the full theme, plus backward-compatible color + symbol."""
     user = session.get("user")
     if user:
         try:
             members = auth.load_members()
             info = members.get(user)
             if info:
+                theme = auth.get_card_theme(user)
                 return {
-                    "user_color": info.get("color") or "#6a4fa3",
+                    "user_theme": theme,
+                    "user_color": theme["primary"],
+                    "user_secondary": theme["secondary"],
+                    "user_radius": theme["radius"],
+                    "user_panel_style": theme["panel_style"],
+                    "user_mood": theme["mood"],
                     "my_symbol": info.get("symbol") or "✦",
                 }
         except Exception:
             pass
-    return {"user_color": "#6a4fa3", "my_symbol": ""}
+    fallback = auth.get_card_theme("")
+    return {
+        "user_theme": fallback,
+        "user_color": fallback["primary"],
+        "user_secondary": fallback["secondary"],
+        "user_radius": fallback["radius"],
+        "user_panel_style": fallback["panel_style"],
+        "user_mood": fallback["mood"],
+        "my_symbol": "",
+    }
 
 
 def current_user():

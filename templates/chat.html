@@ -11,24 +11,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Sephira">
     <link rel="apple-touch-icon" href="/static/icon.svg">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
-        :root { --accent: {{ user_color }}; }
+        :root { --accent: {{ user_color }}; --secondary: {{ user_secondary }}; --radius: {{ user_radius }}; }
         * { box-sizing: border-box; }
         body { font-family: Georgia, serif; background: color-mix(in srgb, var(--accent) 10%, #0f0d14 90%); color: #d8d4e0; margin: 0; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
+            content: ''; position: fixed; inset: 0;
             background:
                 radial-gradient(ellipse 60% 50% at 50% 40%,
-                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%,
-                    transparent 60%),
+                    color-mix(in srgb, var(--accent) 20%, transparent 80%) 0%, transparent 60%),
                 radial-gradient(ellipse at center,
-                    transparent 0%,
-                    rgba(10, 8, 18, 0.5) 60%,
-                    rgba(3, 2, 8, 0.9) 100%);
-            pointer-events: none;
-            z-index: 0;
+                    transparent 0%, rgba(10, 8, 18, 0.5) 60%, rgba(3, 2, 8, 0.9) 100%);
+            pointer-events: none; z-index: 0;
         }
         .bg-symbol {
             position: fixed; top: 50%; left: 50%;
@@ -40,8 +35,36 @@
         .container { width: 100%; max-width: 720px; position: relative; z-index: 1; }
         h1 { text-align: center; font-size: 1.6em; margin-bottom: 0.2em; }
         .subtitle { text-align: center; color: #6a6380; font-size: 0.9em; margin-bottom: 30px; }
-        .messages { background: color-mix(in srgb, var(--accent) 8%, #1a1724 92%); border: 1px solid color-mix(in srgb, var(--accent) 15%, #2a2536 85%); border-radius: 8px; padding: 20px; min-height: 300px; max-height: 500px; overflow-y: auto; margin-bottom: 20px; }
-        .message { margin-bottom: 14px; padding: 12px 16px; border-radius: 8px; }
+        .messages {
+            border-radius: var(--radius);
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 15%, rgba(20, 18, 30, 0.55)) 0%,
+                color-mix(in srgb, var(--secondary) 6%, rgba(10, 8, 18, 0.85)) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            min-height: 300px; max-height: 500px; overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        body.panel-frosted .messages { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        body.panel-solid .messages {
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 25%, rgba(20, 18, 30, 0.9)) 0%,
+                color-mix(in srgb, var(--secondary) 12%, rgba(8, 6, 14, 0.95)) 100%);
+            border: 2px solid var(--accent);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+        }
+        body.panel-outline .messages {
+            background: color-mix(in srgb, var(--accent) 5%, transparent 95%);
+            border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent 45%);
+            box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 20%, transparent 80%);
+        }
+        .message { margin-bottom: 14px; padding: 12px 16px; border-radius: calc(var(--radius) * 0.65); transition: opacity 0.3s; }
+        .message.new-flash { animation: flash-in 0.6s ease-out; }
+        @keyframes flash-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
         .meta { font-size: 0.85em; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .meta .symbol { font-size: 1.3em; line-height: 1; }
         .meta .name { font-weight: bold; }
@@ -56,15 +79,56 @@
         .message.deleted .meta .symbol { opacity: 0.4; }
         .deleted-note { font-size: 0.75em; color: #8a3a4a; margin-top: 4px; font-style: italic; }
         .empty { color: #6a6380; text-align: center; font-style: italic; }
+        .typing-line {
+            height: 20px;
+            font-size: 0.8em;
+            color: #8a7fb0;
+            font-style: italic;
+            padding: 0 6px 6px;
+            text-align: left;
+        }
         form.new-message { display: flex; gap: 10px; }
-        input[type="text"] { flex: 1; padding: 12px; background: #1a1724; border: 1px solid #3a3450; color: #d8d4e0; border-radius: 6px; font-family: inherit; font-size: 1em; min-width: 0; }
+        input[type="text"] {
+            flex: 1; padding: 12px 16px;
+            background: rgba(20, 18, 26, 0.7);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
+            color: #d8d4e0; border-radius: calc(var(--radius) * 0.65);
+            font-family: inherit; font-size: 1em; min-width: 0;
+        }
+        body.panel-frosted input[type="text"] { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        body.panel-solid input[type="text"] {
+            background: color-mix(in srgb, var(--accent) 15%, rgba(8, 6, 14, 0.95) 85%);
+            border-width: 2px;
+        }
+        body.panel-outline input[type="text"] {
+            background: color-mix(in srgb, var(--accent) 3%, transparent 97%);
+            border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent 55%);
+        }
         input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-        button.send { padding: 12px 24px; background: var(--accent); border: none; color: #fff; border-radius: 6px; font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0; transition: opacity 0.15s; }
-        button.send:hover:not(:disabled) { filter: brightness(1.2); }
-        button.send:disabled { opacity: 0.6; cursor: wait; }
+        button.send {
+            padding: 12px 24px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--accent) 90%, transparent 10%) 0%,
+                color-mix(in srgb, var(--secondary) 60%, rgba(20, 18, 30, 0.6) 40%) 100%);
+            border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent 40%);
+            color: #fff; border-radius: calc(var(--radius) * 0.65);
+            font-size: 1em; cursor: pointer; font-family: inherit; flex-shrink: 0;
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+            transition: filter 0.2s, transform 0.15s;
+        }
+        button.send:hover { filter: brightness(1.15); transform: translateY(-1px); }
         .topnav { text-align: center; margin-bottom: 24px; font-size: 0.9em; line-height: 1.8; }
         .topnav a { color: var(--accent); text-decoration: none; margin: 0 6px; }
         .topnav a:hover { filter: brightness(1.3); }
+        .conn-status {
+            text-align: center;
+            font-size: 0.75em;
+            color: #6a6380;
+            margin-bottom: 12px;
+            height: 16px;
+        }
+        .conn-status.live { color: #42c878; }
+        .conn-status.reconnecting { color: #d8a838; }
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.4em; }
@@ -81,12 +145,12 @@
         }
     </style>
 </head>
-<body>
+<body class="panel-{{ user_panel_style }}"
+      data-current-user="{{ current_user }}"
+      data-is-fool="{{ 'true' if is_fool else 'false' }}">
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
+            window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
         }
     </script>
     <div class="bg-symbol" aria-hidden="true">{{ my_symbol }}</div>
@@ -100,10 +164,13 @@
         </div>
         <h1>The Gathering</h1>
         <p class="subtitle">You speak as {{ title }} {{ display }}.</p>
-        <div class="messages">
+        <div class="conn-status" id="conn-status"></div>
+        <div class="messages" id="messages-container">
             {% if messages %}
                 {% for m in messages %}
-                    <div class="message {% if m.deleted %}deleted{% endif %}" style="border-left: 3px solid {{ m.sender_color }}; background: {{ m.sender_color }}18;">
+                    <div class="message {% if m.deleted %}deleted{% endif %}"
+                         data-message-id="{{ m.id }}"
+                         style="border-left: 3px solid {{ m.sender_color }}; background: {{ m.sender_color }}18;">
                         <div class="meta">
                             <span class="symbol" style="color: {{ m.sender_color }};">{{ m.sender_symbol }}</span>
                             <span class="name" style="color: {{ m.sender_color }};">{{ m.sender_title }} {{ m.sender_display }}</span>
@@ -121,41 +188,176 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <p class="empty">The gathering is silent. Speak, and it shall begin.</p>
+                <p class="empty" id="empty-notice">The gathering is silent. Speak, and it shall begin.</p>
             {% endif %}
         </div>
+        <div class="typing-line" id="typing-line"></div>
         <form method="post" class="new-message">
-            <input type="text" name="text" placeholder="Speak your mind..." autocomplete="off" autofocus required>
+            <input type="text" name="text" id="message-input" placeholder="Speak your mind..." autocomplete="off" autofocus required>
             <button type="submit" class="send">Send</button>
         </form>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', () => {
-                    const os = form.getAttribute('onsubmit') || '';
-                    if (os.includes('confirm')) return;
-                    const btn = form.querySelector('button[type="submit"]');
-                    if (btn && !btn.disabled) {
-                        setTimeout(() => {
-                            btn.disabled = true;
-                            btn.textContent = 'Sending...';
-                        }, 0);
-                    }
-                });
+        (function () {
+            const socket = io();
+            const container = document.getElementById("messages-container");
+            const typingLine = document.getElementById("typing-line");
+            const input = document.getElementById("message-input");
+            const connStatus = document.getElementById("conn-status");
+            const isFool = document.body.dataset.isFool === "true";
+            const currentUser = document.body.dataset.currentUser || "";
+
+            const typingUsers = new Set();
+            let typingSendTimeout = null;
+            let typingStopTimeout = null;
+
+            // ---------- helpers ----------
+            function escapeHtml(str) {
+                const div = document.createElement("div");
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function scrollToBottom() {
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function buildMessageElement(m, extraClass) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "message " + (extraClass || "");
+                wrapper.dataset.messageId = m.id;
+                wrapper.style.borderLeft = "3px solid " + m.sender_color;
+                wrapper.style.background = m.sender_color + "18";
+
+                const meta = document.createElement("div");
+                meta.className = "meta";
+
+                const sym = document.createElement("span");
+                sym.className = "symbol";
+                sym.style.color = m.sender_color;
+                sym.textContent = m.sender_symbol;
+                meta.appendChild(sym);
+
+                const name = document.createElement("span");
+                name.className = "name";
+                name.style.color = m.sender_color;
+                name.textContent = m.sender_title + " " + m.sender_display;
+                meta.appendChild(name);
+
+                const time = document.createElement("span");
+                time.className = "time";
+                time.textContent = "just now";
+                meta.appendChild(time);
+
+                const spacer = document.createElement("span");
+                spacer.className = "spacer";
+                meta.appendChild(spacer);
+
+                if (isFool) {
+                    const delForm = document.createElement("form");
+                    delForm.method = "post";
+                    delForm.action = "/chat/delete";
+                    delForm.onsubmit = () => confirm("Delete this message?");
+                    const hidden = document.createElement("input");
+                    hidden.type = "hidden";
+                    hidden.name = "message_id";
+                    hidden.value = m.id;
+                    delForm.appendChild(hidden);
+                    const delBtn = document.createElement("button");
+                    delBtn.type = "submit";
+                    delBtn.className = "delete";
+                    delBtn.textContent = "Delete";
+                    delForm.appendChild(delBtn);
+                    meta.appendChild(delForm);
+                }
+
+                wrapper.appendChild(meta);
+
+                const text = document.createElement("div");
+                text.className = "text";
+                text.textContent = m.text;
+                wrapper.appendChild(text);
+
+                return wrapper;
+            }
+
+            function updateTypingLine() {
+                if (typingUsers.size === 0) {
+                    typingLine.textContent = "";
+                } else if (typingUsers.size === 1) {
+                    const u = Array.from(typingUsers)[0];
+                    typingLine.textContent = u + " is typing...";
+                } else if (typingUsers.size === 2) {
+                    const arr = Array.from(typingUsers);
+                    typingLine.textContent = arr[0] + " and " + arr[1] + " are typing...";
+                } else {
+                    typingLine.textContent = typingUsers.size + " people are typing...";
+                }
+            }
+
+            // ---------- socket events ----------
+            socket.on("connect", () => {
+                connStatus.textContent = "● Connected — live updates on";
+                connStatus.className = "conn-status live";
             });
-        });
-        let isTyping = false;
-        const input = document.querySelector('input[name="text"]');
-        if (input) {
-            input.addEventListener('input', () => { isTyping = true; });
-            input.addEventListener('blur',  () => { isTyping = false; });
-        }
-        setInterval(() => {
-            if (!isTyping && !document.hidden) location.reload();
-        }, 3000);
+
+            socket.on("disconnect", () => {
+                connStatus.textContent = "● Disconnected — reloading in a few seconds to catch up";
+                connStatus.className = "conn-status reconnecting";
+                setTimeout(() => location.reload(), 5000);
+            });
+
+            socket.on("new_public_message", (m) => {
+                const empty = document.getElementById("empty-notice");
+                if (empty) empty.remove();
+
+                const el = buildMessageElement(m, "new-flash");
+                container.appendChild(el);
+                scrollToBottom();
+            });
+
+            socket.on("message_deleted", (data) => {
+                const el = container.querySelector('[data-message-id="' + data.id + '"]');
+                if (!el) return;
+                el.classList.add("deleted");
+                const textEl = el.querySelector(".text");
+                if (textEl) textEl.style.textDecoration = "line-through";
+                const nameEl = el.querySelector(".name");
+                if (nameEl) nameEl.style.color = "#6a6380";
+                const symEl = el.querySelector(".symbol");
+                if (symEl) symEl.style.opacity = "0.4";
+                // Remove the delete form so it can't be clicked again
+                const delForm = el.querySelector("form");
+                if (delForm) delForm.remove();
+            });
+
+            socket.on("user_typing", (data) => {
+                typingUsers.add(data.name);
+                updateTypingLine();
+            });
+
+            socket.on("user_stopped_typing", (data) => {
+                typingUsers.delete(data.name);
+                updateTypingLine();
+            });
+
+            // ---------- typing emitter ----------
+            if (input) {
+                input.addEventListener("input", () => {
+                    if (!typingSendTimeout) {
+                        socket.emit("typing", { room: "public" });
+                        typingSendTimeout = setTimeout(() => { typingSendTimeout = null; }, 1000);
+                    }
+                    if (typingStopTimeout) clearTimeout(typingStopTimeout);
+                    typingStopTimeout = setTimeout(() => {
+                        socket.emit("stop_typing", { room: "public" });
+                    }, 2000);
+                });
+            }
+
+            // ---------- initial scroll ----------
+            scrollToBottom();
+        })();
     </script>
 </body>
 </html>
-
-

@@ -11,6 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Sephira">
     <link rel="apple-touch-icon" href="/static/icon.svg">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         :root { --accent: {{ user_color }}; --secondary: {{ user_secondary }}; --radius: {{ user_radius }}; }
         * { box-sizing: border-box; }
@@ -47,7 +48,7 @@
             border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent 75%);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             padding: 20px; min-height: 300px; max-height: 500px;
-            overflow-y: auto; margin-bottom: 20px;
+            overflow-y: auto; margin-bottom: 10px;
         }
         body.panel-frosted .messages { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         body.panel-solid .messages {
@@ -62,7 +63,12 @@
             border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent 45%);
             box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 20%, transparent 80%);
         }
-        .message { margin-bottom: 14px; padding: 12px 16px; border-radius: calc(var(--radius) * 0.65); }
+        .message { margin-bottom: 14px; padding: 12px 16px; border-radius: calc(var(--radius) * 0.65); transition: opacity 0.3s; }
+        .message.new-flash { animation: flash-in 0.6s ease-out; }
+        @keyframes flash-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
         .meta { font-size: 0.85em; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .meta .symbol { font-size: 1.3em; line-height: 1; }
         .meta .name { font-weight: bold; }
@@ -77,6 +83,10 @@
         .message.deleted .meta .symbol { opacity: 0.4; }
         .deleted-note { font-size: 0.75em; color: #8a3a4a; margin-top: 4px; font-style: italic; }
         .empty { color: #6a6380; text-align: center; font-style: italic; }
+        .typing-line {
+            height: 20px; font-size: 0.8em; color: #8a7fb0;
+            font-style: italic; padding: 0 6px 6px; text-align: left;
+        }
         form.new-message { display: flex; gap: 10px; }
         input[type="text"] {
             flex: 1; padding: 12px 16px;
@@ -107,6 +117,12 @@
             transition: filter 0.2s, transform 0.15s;
         }
         button.send:hover { filter: brightness(1.15); transform: translateY(-1px); }
+        .conn-status {
+            text-align: center; font-size: 0.75em; color: #6a6380;
+            margin-bottom: 12px; height: 16px;
+        }
+        .conn-status.live { color: #42c878; }
+        .conn-status.reconnecting { color: #d8a838; }
         @media (max-width: 600px) {
             body { padding: 20px 12px; }
             h1 { font-size: 1.3em; }
@@ -123,7 +139,9 @@
         }
     </style>
 </head>
-<body class="panel-{{ user_panel_style }}">
+<body class="panel-{{ user_panel_style }}"
+      data-thread-id="{{ thread_id }}"
+      data-is-fool="{{ 'true' if is_fool else 'false' }}">
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
@@ -141,10 +159,13 @@
         <a class="back" href="/messages">&larr; All conversations</a>
         <h1>{{ thread_title }}</h1>
         <p class="participants">Members: {{ participants_str }}</p>
-        <div class="messages">
+        <div class="conn-status" id="conn-status"></div>
+        <div class="messages" id="messages-container">
             {% if messages %}
                 {% for m in messages %}
-                    <div class="message {% if m.deleted %}deleted{% endif %}" style="border-left: 3px solid {{ m.sender_color }}; background: {{ m.sender_color }}18;">
+                    <div class="message {% if m.deleted %}deleted{% endif %}"
+                         data-message-id="{{ m.id }}"
+                         style="border-left: 3px solid {{ m.sender_color }}; background: {{ m.sender_color }}18;">
                         <div class="meta">
                             <span class="symbol" style="color: {{ m.sender_color }};">{{ m.sender_symbol }}</span>
                             <span class="name" style="color: {{ m.sender_color }};">{{ m.sender_title }} {{ m.sender_display }}</span>
@@ -161,23 +182,165 @@
                         {% if m.deleted and is_fool %}<div class="deleted-note">Deleted by {{ m.deleted_by }} at {{ m.deleted_at }}</div>{% endif %}
                     </div>
                 {% endfor %}
-            {% else %}<p class="empty">No messages yet. Speak first.</p>{% endif %}
+            {% else %}
+                <p class="empty" id="empty-notice">No messages yet. Speak first.</p>
+            {% endif %}
         </div>
+        <div class="typing-line" id="typing-line"></div>
         <form method="post" action="/messages/{{ thread_id }}/send" class="new-message">
-            <input type="text" name="text" placeholder="Speak privately..." autocomplete="off" autofocus required>
+            <input type="text" name="text" id="message-input" placeholder="Speak privately..." autocomplete="off" autofocus required>
             <button type="submit" class="send">Send</button>
         </form>
     </div>
     <script>
-        let isTyping = false;
-        const input = document.querySelector('input[name="text"]');
-        if (input) {
-            input.addEventListener('input', () => { isTyping = true; });
-            input.addEventListener('blur',  () => { isTyping = false; });
-        }
-        setInterval(() => {
-            if (!isTyping && !document.hidden) location.reload();
-        }, 4000);
+        (function () {
+            const socket = io();
+            const container = document.getElementById("messages-container");
+            const typingLine = document.getElementById("typing-line");
+            const input = document.getElementById("message-input");
+            const connStatus = document.getElementById("conn-status");
+            const isFool = document.body.dataset.isFool === "true";
+            const threadId = parseInt(document.body.dataset.threadId, 10);
+
+            const typingUsers = new Set();
+            let typingSendTimeout = null;
+            let typingStopTimeout = null;
+
+            function scrollToBottom() {
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function buildMessageElement(m, extraClass) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "message " + (extraClass || "");
+                wrapper.dataset.messageId = m.id;
+                wrapper.style.borderLeft = "3px solid " + m.sender_color;
+                wrapper.style.background = m.sender_color + "18";
+
+                const meta = document.createElement("div");
+                meta.className = "meta";
+
+                const sym = document.createElement("span");
+                sym.className = "symbol";
+                sym.style.color = m.sender_color;
+                sym.textContent = m.sender_symbol;
+                meta.appendChild(sym);
+
+                const name = document.createElement("span");
+                name.className = "name";
+                name.style.color = m.sender_color;
+                name.textContent = m.sender_title + " " + m.sender_display;
+                meta.appendChild(name);
+
+                const time = document.createElement("span");
+                time.className = "time";
+                time.textContent = "just now";
+                meta.appendChild(time);
+
+                const spacer = document.createElement("span");
+                spacer.className = "spacer";
+                meta.appendChild(spacer);
+
+                if (isFool) {
+                    const delForm = document.createElement("form");
+                    delForm.method = "post";
+                    delForm.action = "/messages/" + threadId + "/delete";
+                    delForm.onsubmit = () => confirm("Delete this message?");
+                    const hidden = document.createElement("input");
+                    hidden.type = "hidden";
+                    hidden.name = "message_id";
+                    hidden.value = m.id;
+                    delForm.appendChild(hidden);
+                    const delBtn = document.createElement("button");
+                    delBtn.type = "submit";
+                    delBtn.className = "delete";
+                    delBtn.textContent = "Delete";
+                    delForm.appendChild(delBtn);
+                    meta.appendChild(delForm);
+                }
+
+                wrapper.appendChild(meta);
+
+                const text = document.createElement("div");
+                text.className = "text";
+                text.textContent = m.text;
+                wrapper.appendChild(text);
+
+                return wrapper;
+            }
+
+            function updateTypingLine() {
+                if (typingUsers.size === 0) typingLine.textContent = "";
+                else if (typingUsers.size === 1) typingLine.textContent = Array.from(typingUsers)[0] + " is typing...";
+                else if (typingUsers.size === 2) {
+                    const arr = Array.from(typingUsers);
+                    typingLine.textContent = arr[0] + " and " + arr[1] + " are typing...";
+                } else typingLine.textContent = typingUsers.size + " people are typing...";
+            }
+
+            socket.on("connect", () => {
+                connStatus.textContent = "● Connected — live updates on";
+                connStatus.className = "conn-status live";
+            });
+
+            socket.on("disconnect", () => {
+                connStatus.textContent = "● Disconnected — reloading shortly to catch up";
+                connStatus.className = "conn-status reconnecting";
+                setTimeout(() => location.reload(), 5000);
+            });
+
+            socket.on("new_dm_message", (m) => {
+                // Only append if this message belongs to THIS thread
+                if (m.thread_id !== threadId) return;
+                const empty = document.getElementById("empty-notice");
+                if (empty) empty.remove();
+                const el = buildMessageElement(m, "new-flash");
+                container.appendChild(el);
+                scrollToBottom();
+            });
+
+            socket.on("dm_deleted", (data) => {
+                if (data.thread_id !== threadId) return;
+                const el = container.querySelector('[data-message-id="' + data.id + '"]');
+                if (!el) return;
+                el.classList.add("deleted");
+                const textEl = el.querySelector(".text");
+                if (textEl) textEl.style.textDecoration = "line-through";
+                const nameEl = el.querySelector(".name");
+                if (nameEl) nameEl.style.color = "#6a6380";
+                const symEl = el.querySelector(".symbol");
+                if (symEl) symEl.style.opacity = "0.4";
+                const delForm = el.querySelector("form");
+                if (delForm) delForm.remove();
+            });
+
+            socket.on("dm_user_typing", (data) => {
+                if (data.thread_id !== threadId) return;
+                typingUsers.add(data.name);
+                updateTypingLine();
+            });
+
+            socket.on("dm_user_stopped_typing", (data) => {
+                if (data.thread_id !== threadId) return;
+                typingUsers.delete(data.name);
+                updateTypingLine();
+            });
+
+            if (input) {
+                input.addEventListener("input", () => {
+                    if (!typingSendTimeout) {
+                        socket.emit("dm_typing", { thread_id: threadId });
+                        typingSendTimeout = setTimeout(() => { typingSendTimeout = null; }, 1000);
+                    }
+                    if (typingStopTimeout) clearTimeout(typingStopTimeout);
+                    typingStopTimeout = setTimeout(() => {
+                        socket.emit("dm_stop_typing", { thread_id: threadId });
+                    }, 2000);
+                });
+            }
+
+            scrollToBottom();
+        })();
     </script>
 </body>
 </html>

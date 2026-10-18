@@ -5,9 +5,14 @@ import auth
 import messages as msg_store
 from db import init_db
 
+from flask_socketio import SocketIO, emit, join_room
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-fallback-key")
 init_db()
+
+# Socket.IO wrapper for real-time chat
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 
 def relative_time(timestamp_str):
@@ -58,7 +63,6 @@ def inject_nav_unread():
 
 @app.context_processor
 def inject_user_theme():
-    """Provide the full theme, plus backward-compatible color + symbol."""
     user = session.get("user")
     if user:
         try:
@@ -98,6 +102,36 @@ def client_ip():
     if forwarded:
         return forwarded.split(",")[0].strip()
     return request.remote_addr or "unknown"
+
+
+def _decorate_public_message(m):
+    """Turn a raw message row into a fully-styled dict for the template / socket."""
+    members = auth.load_members()
+    sender = m.get("from", "")
+    sender_info = members.get(sender)
+    if sender_info:
+        sender_title = auth.title_for(sender_info["gender"])
+        sender_display = auth.display_name(sender)
+        sender_symbol = sender_info.get("symbol") or "·"
+        sender_color = sender_info.get("color") or "#b8b0c8"
+    else:
+        sender_title = ""
+        sender_display = sender
+        sender_symbol = "·"
+        sender_color = "#b8b0c8"
+
+    return {
+        "id": m.get("id"),
+        "sender_title": sender_title,
+        "sender_display": sender_display,
+        "sender_symbol": sender_symbol,
+        "sender_color": sender_color,
+        "text": m.get("text", ""),
+        "time": m.get("time", ""),
+        "deleted": m.get("deleted", False),
+        "deleted_by": m.get("deleted_by", ""),
+        "deleted_at": m.get("deleted_at", ""),
+    }
 
 
 @app.route("/")
@@ -380,39 +414,18 @@ def chat():
         text = request.form.get("text", "").strip()
         if text:
             msg_store.add_message(user, text)
+            # Emit the new message to everyone via Socket.IO
+            raw = msg_store.load_messages(include_deleted=False)
+            if raw:
+                latest = _decorate_public_message(raw[-1])
+                socketio.emit("new_public_message", latest)
         return redirect(url_for("chat"))
 
     title = auth.title_for(info["gender"])
     display = auth.display_name(user)
 
     raw = msg_store.load_messages(include_deleted=is_fool)
-    decorated = []
-    for m in raw:
-        sender = m.get("from", "")
-        sender_info = all_members.get(sender)
-        if sender_info:
-            sender_title = auth.title_for(sender_info["gender"])
-            sender_display = auth.display_name(sender)
-            sender_symbol = sender_info.get("symbol") or "·"
-            sender_color = sender_info.get("color") or "#b8b0c8"
-        else:
-            sender_title = ""
-            sender_display = sender
-            sender_symbol = "·"
-            sender_color = "#b8b0c8"
-
-        decorated.append({
-            "id": m.get("id"),
-            "sender_title": sender_title,
-            "sender_display": sender_display,
-            "sender_symbol": sender_symbol,
-            "sender_color": sender_color,
-            "text": m.get("text", ""),
-            "time": m.get("time", ""),
-            "deleted": m.get("deleted", False),
-            "deleted_by": m.get("deleted_by", ""),
-            "deleted_at": m.get("deleted_at", ""),
-        })
+    decorated = [_decorate_public_message(m) for m in raw]
 
     return render_template(
         "chat.html",
@@ -420,6 +433,7 @@ def chat():
         display=display,
         messages=decorated,
         is_fool=is_fool,
+        current_user=user,
     )
 
 
@@ -436,6 +450,8 @@ def chat_delete():
     message_id = request.form.get("message_id", "").strip()
     if message_id.isdigit():
         msg_store.soft_delete_message(int(message_id), deleted_by="The Fool")
+        # Notify everyone that this message was deleted
+        socketio.emit("message_deleted", {"id": int(message_id), "from": "The Fool"})
 
     return redirect(url_for("chat"))
 
@@ -575,6 +591,34 @@ def messages_list():
     )
 
 
+def _decorate_dm_message(m, members):
+    sender = m.get("from", "")
+    s_info = members.get(sender)
+    if s_info:
+        s_title = auth.title_for(s_info["gender"])
+        s_display = auth.display_name(sender)
+        s_symbol = s_info.get("symbol") or "·"
+        s_color = s_info.get("color") or "#b8b0c8"
+    else:
+        s_title = ""
+        s_display = sender
+        s_symbol = "·"
+        s_color = "#b8b0c8"
+
+    return {
+        "id": m.get("id"),
+        "sender_title": s_title,
+        "sender_display": s_display,
+        "sender_symbol": s_symbol,
+        "sender_color": s_color,
+        "text": m.get("text", ""),
+        "time": m.get("time", ""),
+        "deleted": m.get("deleted", False),
+        "deleted_by": m.get("deleted_by", ""),
+        "deleted_at": m.get("deleted_at", ""),
+    }
+
+
 @app.route("/messages/<int:thread_id>")
 def messages_thread(thread_id):
     user = current_user()
@@ -611,31 +655,7 @@ def messages_thread(thread_id):
     decorated = []
     newest_id = 0
     for m in raw:
-        sender = m.get("from", "")
-        s_info = members.get(sender)
-        if s_info:
-            s_title = auth.title_for(s_info["gender"])
-            s_display = auth.display_name(sender)
-            s_symbol = s_info.get("symbol") or "·"
-            s_color = s_info.get("color") or "#b8b0c8"
-        else:
-            s_title = ""
-            s_display = sender
-            s_symbol = "·"
-            s_color = "#b8b0c8"
-
-        decorated.append({
-            "id": m.get("id"),
-            "sender_title": s_title,
-            "sender_display": s_display,
-            "sender_symbol": s_symbol,
-            "sender_color": s_color,
-            "text": m.get("text", ""),
-            "time": m.get("time", ""),
-            "deleted": m.get("deleted", False),
-            "deleted_by": m.get("deleted_by", ""),
-            "deleted_at": m.get("deleted_at", ""),
-        })
+        decorated.append(_decorate_dm_message(m, members))
         if m.get("id") and m["id"] > newest_id:
             newest_id = m["id"]
 
@@ -650,6 +670,7 @@ def messages_thread(thread_id):
         thread_title=thread_title,
         participants_str=participants_str,
         messages=decorated,
+        current_user=user,
     )
 
 
@@ -665,6 +686,12 @@ def messages_thread_send(thread_id):
     text = request.form.get("text", "").strip()
     if text:
         msg_store.add_dm_message(thread_id, user, text)
+        # Load the newest DM to emit
+        raw = msg_store.load_dm_messages(thread_id, include_deleted=False)
+        if raw:
+            members = auth.load_members()
+            latest = _decorate_dm_message(raw[-1], members)
+            socketio.emit("new_dm_message", {"thread_id": thread_id, **latest})
 
     return redirect(url_for("messages_thread", thread_id=thread_id))
 
@@ -682,6 +709,7 @@ def messages_thread_delete(thread_id):
     message_id = request.form.get("message_id", "").strip()
     if message_id.isdigit():
         msg_store.soft_delete_dm_message(int(message_id), deleted_by="The Fool")
+        socketio.emit("dm_deleted", {"thread_id": thread_id, "id": int(message_id), "from": "The Fool"})
 
     return redirect(url_for("messages_thread", thread_id=thread_id))
 
@@ -733,5 +761,54 @@ def not_found(e):
     return render_template("404.html"), 404
 
 
+# ---------------- Socket.IO events ----------------
+
+@socketio.on("connect")
+def handle_connect():
+    user = session.get("user")
+    if user:
+        join_room("public")   # everyone in chat sees each other's typing
+
+
+@socketio.on("typing")
+def handle_typing(data):
+    user = session.get("user")
+    if not user:
+        return
+    room = data.get("room", "public")
+    if room == "public":
+        emit("user_typing", {"name": user}, broadcast=True, include_self=False, room="public")
+
+
+@socketio.on("stop_typing")
+def handle_stop_typing(data):
+    user = session.get("user")
+    if not user:
+        return
+    room = data.get("room", "public")
+    if room == "public":
+        emit("user_stopped_typing", {"name": user}, broadcast=True, include_self=False, room="public")
+
+
+@socketio.on("dm_typing")
+def handle_dm_typing(data):
+    user = session.get("user")
+    if not user:
+        return
+    thread_id = data.get("thread_id")
+    if thread_id:
+        emit("dm_user_typing", {"name": user, "thread_id": thread_id}, broadcast=True, include_self=False)
+
+
+@socketio.on("dm_stop_typing")
+def handle_dm_stop_typing(data):
+    user = session.get("user")
+    if not user:
+        return
+    thread_id = data.get("thread_id")
+    if thread_id:
+        emit("dm_user_stopped_typing", {"name": user, "thread_id": thread_id}, broadcast=True, include_self=False)
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app, debug=True, host="127.0.0.1", port=5000)

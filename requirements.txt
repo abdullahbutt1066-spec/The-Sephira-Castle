@@ -2,3 +2,6 @@
 gunicorn
 psycopg[binary]
 python-dotenv
+resend
+flask-socketio
+eventlet
